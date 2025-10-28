@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <?php
+            require_once("db.php");
+            require_once("variables.php");
+            require 'fpdf/fpdf.php';
+
+            $sfpdf = new FPDF();
+            $sfpdf->AddPage('P','A4',0);
+            $sfpdf->SetFont('Calibri','',12);
+            $sfpdf->Cell(80,10,'Esto es una celda de 40 x 10',1);        
+            $sfpdf->Cell(50,10,'Celda de 50 x 10',1);
+            $sfpdf->Ln(10);
+            $sfpdf->SetFont('Arial','B',18);
+            $pdf->Cell(80, 10, 'Esto es una celda de 40 x 10', 1);
+            $pdf->Cell(50, 10, 'Celda de 50 x 10', 0);
+            $pdf->Output();
+        ?>
+    </div>
+    <h1><?php
+            require_once("db.php");
+            require_once("variables.php");
+            require 'fpdf/fpdf.php';
+            require "fpdf/plantillapdf.php";
+
+            $sfpdf = new FPDF();
+            $sfpdf->AddPage('P','A4',0);
+            $sfpdf->SetFont('Calibri','',12);
+            $sfpdf->Cell(80,10,'Esto es una celda de 40 x 10',1);        
+            $sfpdf->Cell(50,10,'Celda de 50 x 10',1);
+            $sfpdf->Ln(10);
+            $sfpdf->SetFont('Arial','B',18);
+            $pdf->Cell(80, 10, 'Esto es una celda de 40 x 10', 1);
+            $pdf->Cell(50, 10, 'Celda de 50 x 10', 0);
+            $pdf->Output();
+        ?></h1>    
+</body>
+</html>

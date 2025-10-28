@@ -1,0 +1,161 @@
+<?php
+    require_once("db.php");
+    require_once("include/header.php");
+    require_once("variables.php");
+    $sql1 = "SELECT * FROM Proveedores";
+    $sql2 = "SELECT PrdDenominacion, PrdContacto, PrdTelefono, PrdEmail, PrdDireccion, 
+        PrdProvincia, PrdMunicipio, PrdPais, PrdCodigopostal, PrdWeb, PrdNotas, PrdFechaAlta, 
+        PrdFechaExpiracion FROM Proveedores WHERE PrdDenominacion = $denomina AND PrdCentro = $numero";
+    session_start();
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Proveedores</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#miTabla').DataTable();
+        });
+        function mostrarDatos() {
+            var denominacion = document.getElementById('denominacion').value;
+            document.getElementById('denominacion_hidden').value = denominacion;
+            document.getElementById('denominacion_hidden_eliminar').value = denominacion;
+            if(denominacion != "") {
+                $.ajax({
+                    url: 'obtenerDatos.php',
+                    type: 'GET',
+                    data: { denominacion: denominacion },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        if(data) {
+                            $('#PrdCif').val(data.PrdCif);
+                            $('#PrdCentro').val(data.PrdCentro);
+                            $('#PrdContacto').val(data.PrdContacto);
+                            $('#PrdTelefono').val(data.PrdTelefono);
+                            $('#PrdEmail').val(data.PrdEmail);
+                            $('#PrdDireccion').val(data.PrdDireccion);
+                            $('#PrdProvincia').val(data.PrdProvincia);
+                            $('#PrdMunicipio').val(data.PrdMunicipio);
+                            $('#PrdPais').val(data.PrdPais);
+                            $('#PrdCodigopostal').val(data.PrdCodigopostal);
+                            $('#PrdWeb').val(data.PrdWeb);
+                            $('#PrdNotas').val(data.PrdNotas);
+                            $('#PrdFechaAlta').val(data.PrdFechaAlta);
+                            $('#PrdFechaExpiracion').val(data.PrdFechaExpiracion);
+                        }
+                    }
+                });
+            }
+        }
+        function confirmarEliminacion() {
+            if (confirm('¿Estás seguro de que quieres eliminar este proveedor?')) {
+                if (confirm('¿Realmente estás seguro de que quieres eliminar este proveedor?')) {
+                    document.getElementById('formEliminar').submit();
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <?php
+                $identifico = $_POST['ide'];
+                $espacio = " ";
+                $coma = ", ";
+                $apellidoUno = $_POST['apu'];
+                if($apellidoUno == ""){
+                    echo "Parametro inexistente";
+                }
+                $apellidoDos = $_POST['apd'];
+                $nombre = $_POST['nom'];
+                $centroDen = $_POST['cen'];
+                $numero = $_POST['num'];
+                $estaidentificado = strval($identifico);
+                $estaidentificacion = "**".substr($estaidentificado,2,2)."*".substr($estaidentificado,5,1)."**".substr($estaidentificado,8,1);
+                print"<p><b>$espacio $centroDen $espacio Usuario-></b>$estaidentificacion $espacio $apellidoUno $espacio $apellidoDos $coma $nombre</p>";
+                $micentro = $centroDen;
+            ?>
+        </div> 
+        <div class="row">
+            <div class="col">
+                <div class="card card-body">
+                    <form>
+                        <label for="denominacion"><b>Selecciona un proveedor para borrarlo:  </b></label>
+                        <select id="denominacion" name="denominacion" onchange="mostrarDatos()">
+                            <option value="" selected>Seleccionar</option>
+                            <?php
+                                require_once("db.php");
+                                $quer = "SELECT PrdDenominacion FROM Proveedores WHERE PrdCentro = $numero";
+                                $resu = $conn->query($quer);
+                                if($resu->num_rows > 0){
+                                    while($row = $resu->fetch_assoc()){
+                                        echo "<option value='" . $row['PrdDenominacion'] . "'>" . $row['PrdDenominacion'] . "</option>";
+                                    }
+                                }
+                            ?>
+                        </select>
+                    </form>
+                </div>
+                <div class="card card-body">
+                    <form method="POST" action="actualizarProveedor.php">
+                        <input type="hidden" name="denominacion" id="denominacion_hidden">
+                        <input type="hidden" name="centro" value="<?php echo $centroDen;?>">
+                        <input type="hidden" name="numero" value="<?php echo $numero;?>">
+                        <input type="hidden" name="apu" value="<?php echo $apellidoUno;?>">
+                        <input type="hidden" name="apd" value="<?php echo $apellidoDos;?>">
+                        <input type="hidden" name="nombre" value="<?php echo $nombre;?>">
+                        <label for="PrdCif"><b>CIF.:</b></label>
+                        <input type="text" id="PrdCif" name="PrdCif" size="11"><br>
+                        <label for="PrdContacto"><b>CONTACTO.:</b></label>
+                        <input type="text" id="PrdContacto" name="PrdContacto" size="90">
+                        <label for="PrdTelefono"><b>TELEFONO.:</b></label>
+                        <input type="text" id="PrdTelefono" name="PrdTelefono" size="17"><br>
+                        <label for="PrdEmail"><b>EMAIL.:</b></label>
+                        <input type="text" id="PrdEmail" name="PrdEmail" size="60">
+                        <label for="PrdWeb"><b>WEB.:</b></label>
+                        <input type="text" id="PrdWeb" name="PrdWeb" size="58"><br>
+                        <label for="PrdDireccion"><b>DIRECCIÓN.:</b></label>
+                        <input type="text" id="PrdDireccion" name="PrdDireccion" size="76">
+                        <label for="PrdPais"><b>PAÍS.:</b></label>
+                        <input type="text" id="PrdPais" name="PrdPais" size="37"><br>
+                        <label for="PrdProvincia"><b>PROVINCIA.:</b></label>
+                        <input type="text" id="PrdProvincia" name="PrdProvincia" size="35">
+                        <label for="PrdMunicipio"><b>MUNICIPIO.:</b>:</label>
+                        <input type="text" id="PrdMunicipio" name="PrdMunicipio" size="35">
+                        <label for="PrdCodigopostal"><b>CÓDICO POSTAL.:</b></label>
+                        <input type="text" id="PrdCodigopostal" name="PrdCodigopostal" size="4"><br>
+                        <label for="PrdNotas"><b>NOTAS.:</b></label><br>
+                        <textarea id="PrdNotas" name="PrdNotas" cols="142" rows="5" style="resize:none;"></textarea><br>
+                        <label for="PrdFechaAlta"><b>FECHA DE ALTA.:</b></label>
+                        <input type="date" id="PrdFechaAlta" name="PrdFechaAlta">
+                        <label for="PrdFechaExpiracion"><b>FECHA DE EXPIRACIÓN.:</b></label>
+                        <input type="date" id="PrdFechaExpiracion" name="PrdFechaExpiracion"><br>
+                    </form>
+                </div>
+                <div class="card card-body">
+                    <form method="POST" action="eliminarProveedor.php" id="formEliminar">
+                        <input type="hidden" name="denominacion" id="denominacion_hidden_eliminar">
+                        <button class="btn btn-success btn-block" style="background-color: #489F48; font-weight:bold;" type="button" onclick="confirmarEliminacion()">Eliminar Proveedor</button>
+                    </form>
+                </div>
+                <div class="card card-body">
+                    <div class="form-group mx-sm-5">
+                        <!--<input type="submit" class="btn btn-success btn-block" name="salida" value="Salida">-->
+                        <input class="btn btn-success btn-block" style="background-color: #489F48; font-weight:bold;" type="submit" 
+                        onclick="history.back()" name="Página anterior" value="Página anterior">
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+    <div class="footer" background-color: black; position: absolute; bottom: 0; width: 100%; height: 40px; color: white; text-align: center;>
+        &copy; 2020-2025 Gombeth Software's
+    </div>
+</body>
+</html>
