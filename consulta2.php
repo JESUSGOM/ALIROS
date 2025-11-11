@@ -27,6 +27,8 @@
             (strtoupper($usuariorecibido) == "42863837W") ||
             (strtoupper($usuariorecibido) == "44707763H"))
             {
+                $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                mysqli_set_charset($conn, "utf8");
                 $query = "SELECT UsuDni, UsuClave, UsuCentro, UsuNombre, UsuApellidoUno, UsuApellidoDos, 
                         UsuTipo FROM Usuarios 
                         WHERE UsuDni = '".$MayUsu."' AND UsuClave = '".$Maycla."'";

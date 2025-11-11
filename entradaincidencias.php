@@ -17,7 +17,7 @@
                 $nombre = $_POST['nom'];
                 $centroDen = $_POST['cen'];
                 $centro = $_POST['num'];
-                $estecentro = intval($elcentro);
+                $estecentro = intval($centro);
                 if($identifico == "42086955Z" OR $identifico == "42086955z" OR $identifico == "42086599A" OR $identifico == "42086599a"){
                     $super = "SUPERUSUARIO";
                 } else {

@@ -30,7 +30,10 @@
     $elmail = $_POST["emilio"];
     $asunto = "Llamada telefónica recibida para usted en la conserjería del ITC";
     var_dump($_POST);
-    if($email==""){
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
+    if($elmail==""){
+
         $ql = "INSERT INTO Telefonos (TelCentro, TelFecha, TelHora, TelEmisor, TelDestinatario, TelMensaje, 
         TelComunicado) 
         VALUES ('".$numero."', '".$fechatotal."', '".$lahora."', '".$emisor."', '".$receptor."', '".$textoemail."', 0) ";
@@ -43,7 +46,7 @@
     }
     
 
-    if($email<>""){
+    if($elmail<>""){
         $sl = "INSERT INTO EnvioEmail (EnEmDestinatario, EnEmFecha, EnEmHora, EnEmTexto, EnEmEmisor) VALUES ('".$receptor."','".$fechatotal."','".$lahora."','".$textoemail."','".$nom."')";
         mysqli_query($conn, $sl);
         if(isset($_POST['llamada'])){
@@ -83,6 +86,6 @@
         }
     }
     
-    header("location: principal.php?apu=$apell1 & apd=$apell2 & nom=$nom & cen=$cenden & num=$numero");
+    header("location: principal.php?apu=$apellidoUno & apd=$apellidoDos & nom=$nom & cen=$cenden & num=$numero");
     
 ?>

@@ -81,7 +81,7 @@
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                             <?php
-                                $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Pass@LIr0S','Conlabac');
+                                $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
                                 mysqli_set_charset($conn, "utf8");
                                 // Obtener datos del menú principal
                                 $mimenu = "SELECT MnNombre, MnUrl, MnId, MnSvg, MnParentId
@@ -116,7 +116,7 @@
                                                         </button>
                                                         <?php
                                                         //mysqli_close($conn);
-                                                        //$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Pass@LIr0S','Conlabac');
+                                                        //$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
                                                         //mysqli_set_charset($conn, "utf8");
                                                         $misubmenu = "SELECT MnNombre, MnUrl, MnId
                                                                     FROM Menus, MapaMenu

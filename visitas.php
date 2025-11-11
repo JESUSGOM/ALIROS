@@ -57,6 +57,8 @@
             <p>Destino y planta.: 
                 <select name="empresa">
                     <?php
+                        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                        mysqli_set_charset($conn, "utf8");
                         $query2 = "SELECT AlqEmpresa FROM Alquileres WHERE AlqCentro = '" .$numero. "'";
                         $resultado = mysqli_query($conn, $query2);
                         if($resultado = mysqli_query($conn, $query2)) {
@@ -68,6 +70,8 @@
                 </select>
                 <select name="planta">
                     <?php
+                        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                        mysqli_set_charset($conn, "utf8");
                         $query2 = "SELECT PltPlanta FROM Plantas WHERE PltCentro = '" .$numero. "'";
                         $resultado = mysqli_query($conn, $query2);
                         if($resultado = mysqli_query($conn, $query2)){

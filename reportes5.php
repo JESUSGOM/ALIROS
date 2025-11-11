@@ -4,8 +4,8 @@
     session_start();
     require 'include/user_sesion.php';
     require ("fpdf/fpdf.php");
-//    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Pass@LIr0S','Conlabac');
-//    mysqli_set_charset($conn, "utf8");
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     //echo var_dump($_POST);
     $mesano = $_POST['mesano'];
     $sucursal = $_POST['sucursal'];
@@ -27,7 +27,7 @@
     $valnmes = 0;
     $valnanio = 0;
     //Capturamos el nombre del centro según se recibe la variable $centros
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
     mysqli_set_charset($conn, "utf8");
     $misql = "SELECT CenDen FROM Centros WHERE CenId = $centros";
     $result = mysqli_query($conn, $misql);
@@ -428,9 +428,9 @@
     $fila += 7; // Incrementamos $fila para la primera fila de datos
     $pdf->SetFillColor(255,255,255);
     $pdf->SetTextColor(0,0,0);
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
     mysqli_set_charset($conn, "utf8");
-    // Consulta SQL corregida
+        // Consulta SQL corregida
     // Asegúrate que $centro sea numérico, si no, usa comillas:
     // $sql = "SELECT ... WHERE Usucentro = '$centro' AND UsuTipo = 'U'";
     $sql = "SELECT UsuApellidoUno, UsuApellidoDos, UsuNombre, UsuCargo FROM Usuarios WHERE Usucentro = " . $centro . " AND UsuTipo = 'U' OR UsuTipo = 'Y'";
@@ -474,7 +474,7 @@
      */
     $pdf->AddPage('L','A4');
     $fila = 20;
-    mysqli_set_charset($conn, "utf8");
+//    mysqli_set_charset($conn, "utf8");
     // Encabezado
     $pdf->SetXY(10, $fila);
     $pdf->SetFont('Arial','B',15);
@@ -497,7 +497,8 @@
     $pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'C',true);
     $fila += 7;
     // Conexión a la base de datos
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     if (!$conn) {
         die("Error de conexión: " . mysqli_connect_error());
     }
@@ -580,8 +581,7 @@
         $pdf->SetTextColor(255);
         $pdf->SetFont('Arial', 'B', 12);
         //Conectamos bbdd para obtener el número de registros de las visitas.
-        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S',
-        'Conlabac');
+        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
         mysqli_set_charset($conn, "utf8");
         $elsql = "SELECT COUNT(*) AS Total FROM Movadoj WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'";
         $result = mysqli_query($conn, $elsql);

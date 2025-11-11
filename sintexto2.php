@@ -17,7 +17,9 @@
                 </tr>
             </thead>
             <tbody style="height: 200px; display:inline-block; width:100%; overflow: auto; border: 1px solid;">
-                <?php 
+                <?php
+                    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                    mysqli_set_charset($conn, "utf8");
                     $conn->set_charset('utf-8');
                     echo nl2br(" \n");
                     echo "Conexión establecida";

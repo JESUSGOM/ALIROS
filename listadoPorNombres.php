@@ -53,9 +53,9 @@
                     <tbody>
                         <?php
                             $nom = $_POST['unombre'];
-                            $conn = mysqli_connect('mysql-5705.dinaserver.com', 'Conacelbs','C0n@celbs','Conlabac');
+                            $conn = mysqli_connect('mysql-5705.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
                             mysqli_set_charset($conn, "utf8");
-                            $qq = "SELECT MovNombre, MovApellidoUno, MovApellidoDos FROM Movadoj WHERE MovCentro = '".$centro."' AND MovNombre = '" .$nom. "' GROUP BY MovNombre, MovApellidoUno, MovApellidoDos ORDER BY MovNombre ASC ";
+                            $qq = "SELECT MovNombre, MovApellidoUno, MovApellidoDos FROM Movadoj WHERE MovCentro = '".$numero."' AND MovNombre = '" .$nom. "' GROUP BY MovNombre, MovApellidoUno, MovApellidoDos ORDER BY MovNombre ASC ";
                             $rr = mysqli_query($conn, $qq);
                             while($mostrar = mysqli_fetch_array($rr)){
                                 echo "<tr>

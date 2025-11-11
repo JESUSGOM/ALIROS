@@ -80,7 +80,7 @@
     //echo "Fecha formateada de la asignación de la llave => " .$fechatotal;
     //echo "<br>";
 
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
     mysqli_set_charset($conn, "utf8");
     //print "<p>$apel1 $apel2 $nom $cenden $apellidoUno $apellidoDos $nombre $fechatotal $lahora $numero $regis</p>";
     $que = "INSERT INTO KeyMoves (KeyLlvOrden, KeyCentro, KeyFechaEntrega, KeyHoraEntrega, 

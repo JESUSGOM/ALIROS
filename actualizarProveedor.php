@@ -16,7 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $PrdNotas = $_POST['PrdNotas'];
     $PrdFechaAlta = $_POST['PrdFechaAlta'];
     $PrdFechaExpiracion = $_POST['PrdFechaExpiracion'];
-
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     $sql = "UPDATE Proveedores SET 
         PrdCif = '$PrdCif', PrdContacto = '$PrdContacto', PrdTelefono = '$PrdTelefono', 
         PrdEmail = '$PrdEmail', PrdDireccion = '$PrdDireccion', PrdProvincia = '$PrdProvincia', 

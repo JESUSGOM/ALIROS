@@ -52,6 +52,8 @@
                 </thead>
                 <tbody>
                     <?php
+                        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                        mysqli_set_charset($conn, "utf8");
                         echo $inicioBusqueda;
                         $laquery = "SELECT MovNombre, MovApellidoUno, MovApellidoDos, 
                         CONCAT(MovApellidoUno, ' ', MovApellidoDos, ' ', MovNombre) AS ElCampo 

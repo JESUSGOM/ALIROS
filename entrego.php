@@ -56,6 +56,8 @@
     echo nl2br(" \n ");
     echo $forma;*/
     //$nom2 = substr($nombre,0,9);
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     if($conn === false){
         echo "Fallo en la conexión";
         echo mysqli_connect_errno();

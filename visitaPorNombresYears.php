@@ -73,10 +73,10 @@
                 echo "<br>";
             ?>
             <form action="" method="POST">
-                <input type="hidden" name="apu" value="<?php echo $apellidoUno;?>"/>
-                <input type="hidden" name="apd" value="<?php echo $apellidoDos;?>"/>
-                <input type="hidden" name="nom" value="<?php echo $nombre;?>"/>
-                <input type="hidden" name="cen" value="<?php echo $denominacion;?>"/>
+                <input type="hidden" name="apu" value="<?php echo $apell1;?>"/>
+                <input type="hidden" name="apd" value="<?php echo $apell2;?>"/>
+                <input type="hidden" name="nom" value="<?php echo $nom;?>"/>
+                <input type="hidden" name="cen" value="<?php echo $cenden;?>"/>
                 <input type="hidden" name="num" value="<?php echo $numero;?>"/>
                 <input type="hidden" name="ide" value="<?php echo $identifico;?>"/>
                 <input style="background-color: #8ADCEC; font-weight:bold;" type="button" 

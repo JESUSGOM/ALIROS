@@ -52,6 +52,8 @@
                     </thead>
                     <tbody>
                         <?php
+                            $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                            mysqli_set_charset($conn, "utf8");
                             $comunico = "No";
                             $qw = "SELECT PktId, PktFecha, PktHora, PktEmisor, PktDestinatario, PktMensajeria, PktBultos, PktTipo, PktOperario FROM Paqueteria WHERE PktCentro = '" .$elNumero. "' AND PktComunicado = '".$comunico."' ";
                             $resultado = mysqli_query($conn, $qw);

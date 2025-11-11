@@ -61,9 +61,10 @@
     echo nl2br(" \n ");
     echo "Número de centro recibido = ";
     echo $elcentro;
-
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     $bermudez = $conn->prepare("UPDATE EntreTurnos SET EntUsuario = ?, EntFleido = ?, EntHleido = ? WHERE EntId = ?");
     $bermudez->bind_param('sssi',$identifico, $fecha, $hora, $nreg);
     $bermudez->execute();
-    header("location: principal.php?apu=$apel1 & apd=$apel2 & nom=$nom & cen=$cenden & num=$elcentro & ide=$identifico");
+    header("location: principal.php?apu=$apell1 & apd=$apell2 & nom=$elnombre & cen=$cenden & num=$elcentro & ide=$identifico");
 ?>

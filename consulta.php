@@ -22,6 +22,8 @@
         echo "Vamos a imprimir mas datos a partir de aquí";
         echo "<br>";
         //Creamos la query para buscar los datos del usuario dentro de la tabla Usuarios de la base de datos Conlabac
+        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+        mysqli_set_charset($conn, "utf8");
         $query = "SELECT UsuDni, UsuClave, UsuCentro, UsuNombre, UsuApellidoUno, UsuApellidoDos, 
         UsuTipo FROM Usuarios 
         WHERE UsuDni = '".$MayUsu."' AND UsuClave = '".$Maycla."'";

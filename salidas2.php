@@ -58,6 +58,8 @@
                 </thead>
                 <tbody>
                     <?php
+                        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                        mysqli_set_charset($conn, "utf8");
                         $laquery = "SELECT MovOrden, MovNombre, MovApellidoUno, MovApellidoDos, MovProcedencia,
                         MovDestino, MovPlanta, MovFechaEntrada, MovHoraEntrada, MovVehiculo, MovMotivo FROM Movadoj 
                         WHERE MovCentro = '" .$numero. "' AND MovFechaEntrada = '" .$fecha. "' AND MovFechaSalida IS NULL ORDER BY MovNombre ASC";

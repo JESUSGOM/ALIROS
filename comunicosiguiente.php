@@ -61,7 +61,8 @@
     echo "Número de centro recibido = ";
     echo $elcentro;
 
-    
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     $maceda = "INSERT INTO EntreTurnos (EntCentro, EntOperario, EntFescrito, EntHescrito, EntTexto) 
     VALUES ('".$elcentro."','".$identifico."','".$fecha."','".$hora."','".$texto."')";
     mysqli_query($conn, $maceda);

@@ -72,6 +72,8 @@
                 <option value="" selected>Seleccionar</option>
                 <?php
                     // Conectar a la base de datos
+                    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                    mysqli_set_charset($conn, "utf8");
                     include 'db_connection.php';
                     $sql = "SELECT PrdCif, PrdDenominacion FROM Proveedores";
                     $result = $conn->query($sql);

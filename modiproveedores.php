@@ -82,6 +82,8 @@
                             <option value="" selected>Seleccionar</option>
                             <?php
                                 require_once("db.php");
+                                $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                                mysqli_set_charset($conn, "utf8");
                                 $quer = "SELECT PrdDenominacion FROM Proveedores WHERE PrdCentro = $numero";
                                 $resu = $conn->query($quer);
                                 if($resu->num_rows > 0){

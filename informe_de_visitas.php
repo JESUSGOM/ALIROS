@@ -41,11 +41,11 @@
                 $cambiocadena = "";
                 $estaidentificado = strval($identifico);
                 $estaidentificacion = "**".substr($estaidentificado,2,2)."*".substr($estaidentificado,5,1)."**".substr($estaidentificado,8,1);
-                $centro = str_replace($buscocadena,$cambiocadena,$centro);
+                $centro = str_replace($buscocadena,$cambiocadena,$numero);
                 $asunto = "Acceso a la aplicación Web";
                 $elmail = "informatica@laborsordtic.org";
-                $textoemail = "El compañero '" + $nom + "', ha accedido a la web Aliros. ";
-                $textoemail .= "Desde '" + $centroDen + "', el día y a la hora indicadas en este correo ";
+                $textoemail = "El compañero '" + $nombre + "', ha accedido a la web Aliros. ";
+                $textoemail .= "Desde '" + $denominacion + "', el día y a la hora indicadas en este correo ";
                 $nombredelusuario = $usurlogu->nombre;
                 $apeunodelusuario = $usurlogu->apellidoUno;
                 $apedosdelusuario = $usurlogu->apellidoDos;

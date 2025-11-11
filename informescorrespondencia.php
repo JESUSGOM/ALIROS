@@ -59,6 +59,8 @@
                 </thead>
                 <tbody>
                     <?php
+                        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                        mysqli_set_charset($conn, "utf8");
                         $esquery = "SELECT P.PktFecha, P.PktHora, P.PktEmisor, P.PktDestinatario, P.PktMensajeria, 
                         concat_ws(' ', P.PktBultos, P.PktTipo) as UnidadesBulto, P.PktComunicado, 
                         P.PktFechaComunicacion, P.PktHoraComunicacion, concat_ws(' ', U.UsuNombre, 

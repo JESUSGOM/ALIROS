@@ -108,7 +108,7 @@
             </thead>
             <tbody>
                 <?php
-                    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+                    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Mi-@cc3s0-es-p@ra-@L1R0!', 'Conlabac');
                     mysqli_set_charset($conn, "utf8");
                     $laquery = "SELECT LlvCodigo, LlvPuerta, LlvPlanta, LlvCajetin, LlvRestriccion 
                     FROM Llaves WHERE LlvCentro = '" .$numero. "' ORDER BY LlvCodigo ASC";

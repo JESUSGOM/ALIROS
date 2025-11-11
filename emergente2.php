@@ -7,7 +7,8 @@ require_once("variables.php");
 require 'include/user_sesion.php';
 
 // Conectar a la base de datos con manejo de errores
-$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs', 'Pass@LIr0S', 'Conlabac');
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
 
 if (!$conn) {
     die("Error de conexión: " . mysqli_connect_error());

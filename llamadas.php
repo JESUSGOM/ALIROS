@@ -99,7 +99,9 @@
                         <option value="sincorreo">Elige persona</option>
                         <?php
                             //$qu = "SELECT *, CONCAT(RptNombre, ' ', RptApellidoUno, ' ', RptApellidoDos) As Datos FROM Retposto WHERE RptCentro = '" . $numero. "' 
-                            //GROUP BY Datos ORDER BY RptNombre ASC";    
+                            //GROUP BY Datos ORDER BY RptNombre ASC";
+                            $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                            mysqli_set_charset($conn, "utf8");
                             $Q2 = "SELECT CONCAT(RptNombre, ' ', RptApellidoUno, ' ', RptApellidoDos), RptEmail FROM `Retposto` WHERE RptCentro = 1 AND RptEmail<>'' ORDER BY RptNombre ASC";
                             $resultado = mysqli_query($conn, $Q2);
                             while($mostrar = mysqli_fetch_array($resultado)) {

@@ -119,13 +119,15 @@
     //echo $horacorregida;
     $numeroentero = intval($numero);
     $nunbultos = intval($bultos);
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     if($comunicado == "No"){
         $y = "INSERT INTO Paqueteria (PktCentro, PktFecha, PktHora, PktEmisor, PktDestinatario, PktMensajeria, PktBultos, PktTipo, PktComunicado, PktOperario) 
         VALUES ('".$numeroentero."','".$fechacorregeida."','".$horacorregida."','".$emisor."','".$destino."','".$mensajero."','".$nunbultos."','".$tipo."','".$comunicado."','".$usu."')";
         mysqli_query($conn, $y);
     }
     if($comunicado == "Si"){
-        if($fechaentregarecogida <> ""){
+        if($fechaentregacorregida <> ""){
             $z = "INSERT INTO Paqueteria (PktCentro, PktFecha, PktHora, PktEmisor, PktDestinatario, PktMensajeria, PktBultos, PktTipo, PktComunicado, PktOperario, 
             PktOperarioCominica, PktTipoComunicado, PktFechaComunicacion, PktHoraComunicacion) 
             VALUES ('".$numeroentero."','".$fechacorregeida."','".$horacorregida."','".$emisor."','".$destino."','".$mensajero."','".$nunbultos."','".$tipo."','".$comunicado."','".$usu."','".$usu."', '".$forma."','".$fechaentregacorregida."','".$horaentregacorregida."')";

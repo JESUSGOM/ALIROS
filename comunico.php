@@ -42,6 +42,8 @@
         //$r = "UPDATE Telefonos 
         //SET (TelComunicado = 1, TelFechaEntrega = '" .$fechas2. "', TelHoraEntrega = '" .$lahora2. "' WHERE TelId = '" .$regis. "' ");
         //$r->execute();
+        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+        mysqli_set_charset($conn, "utf8");
         $t = "UPDATE Telefonos SET TelComunicado = '" .$comunicado. "', 
         TelFechaEntrega = '" .$fechas2. "', 
         TelHoraEntrega = '" .$lahora2. "' WHERE TelId = '".$regis."' ";

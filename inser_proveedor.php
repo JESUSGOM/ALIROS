@@ -19,8 +19,10 @@
     
     
     //session_start();
+    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+    mysqli_set_charset($conn, "utf8");
     if($conn->connect_error){
-        die("Fallo en la conexión: " . $conecto->connect_error);
+        die("Fallo en la conexión: " . $conn->connect_error);
     }
     
     //var_dump($_POST);
@@ -104,7 +106,7 @@
     
     //"<a href=\"javascript:history.go(-2)\">GO BACK</a>";
     //mysqli_query($conn, $query);
-    header("Location: principalitc.php?apu=$apellidoUno & apd=$apellidoDos & nom=$nombre & cen=$centro & num=$numero");
+    header("Location: principalitc.php?apu=$apellidoUno & apd=$apellidoDos & nom=$nom & cen=$centro & num=$numero");
     //header("location: principalitc.php?apu=$apellidoUno & apd=$apellidoDos & nom=$nom & cen=$centro & num=$numero");
 ?>
    

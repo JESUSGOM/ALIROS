@@ -24,12 +24,15 @@
              } else {
                 $super = "";
              }
-             print"
+            $estaidentificado = strval($identifico);
+            $estaidentificacion = "**".substr($estaidentificado,2,2)."*".substr($estaidentificado,5,1)."**".substr($estaidentificado,8,1);
+
+        print"
              <p>
                 <b>
                     $espacio $centroDen $espacio Usuario->
                 </b>
-                $estaidentificacion $espacio $identi $espacio $apellidoUno $espacio $apellidoDos $coma $nombre $espacio $super</p>";
+                $estaidentificacion $espacio $estaidentificado $espacio $apellidoUno $espacio $apellidoDos $coma $nombre $espacio $super</p>";
              
              //var_dump($_POST);
         ?>

@@ -19,7 +19,7 @@
                 $centroDen = $_POST['cen'];
                 $centro = $_POST['num'];
                 $identifico = $_POST['ide'];
-                //$identi = $_SESSION["usuario"];
+                $identi = $_SESSION["usuario"];
                 $buscocadena = " ";
                 $cambiocadena = "";
                 $estaidentificado = strval($identifico);
@@ -36,7 +36,7 @@
                 //$_SESSION["coma"] = $coma;
                 //$_SESSION["num"] = $centro2;
                 //$_SESSION["ide"] = $identifico;
-                print"<p><b>$espacio $centroDen $espacio Usuario-></b>$estaidentificacion $espacio $identi $espacio $apellidoUno $espacio $apellidoDos $coma $nombre $espacio <-> $usuariorecibido</p>";
+                print"<p><b>$espacio $centroDen $espacio Usuario-></b>$estaidentificacion $espacio  $apellidoUno $espacio $apellidoDos $coma $nombre $espacio <-> $usuariorecibido</p>";
             ?>
         </p>
     </div>
@@ -48,6 +48,8 @@
                 <?php
                     // Conectar a la base de datos
                     include 'db_connection.php';
+                    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+                    mysqli_set_charset($conn, "utf8");
                     $sql = "SELECT PrdCif, PrdDenominacion FROM Proveedores";
                     $result = $conn->query($sql);
 
