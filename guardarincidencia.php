@@ -61,7 +61,7 @@
         //$sdestinatario = "conserjeriaitc.gc@grupoenvera.org";
         $sdestinatario = 'jfgb@jfgb.es';
         $asunto = "mensaje de incidencia de prueba";
-        $cuerpoo = 
+        $cuerpoo = $areatexto;
         $mail($sdestinatario, $asunto, $cuerpoo, $headers);
     }
     if($num == "2") {

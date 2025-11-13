@@ -17,8 +17,8 @@ $elmes = intval($esnmes);
 $elanio = intval($esnano);
 $diafactura = date("d",(mktime(0,0,0,$elmes+1,1,$elanio)-1));
 $esndia = strval($diafactura);
-$esnmes = strval($elmes);
-$esnanio = strval($esnano);
+$esnmes = strval($elmes); // $esnmes es string (ej: "7")
+$esnanio = strval($esnano); // $esnanio es string (ej: "2025")
 $esmesanio = str_replace("-", "", $mesano);
 $esmesanio = $esmesanio. "%";
 $totalconteoderegistros = 0;
@@ -33,7 +33,7 @@ if(mysqli_num_rows($result) > 0){
         //echo $centroden;
     }
 }
-switch($esnmes){
+switch($esnmes){ // $esnmes es string
     case "1":
         $esmes = "enero";
         break;
@@ -331,30 +331,33 @@ $pdf->Ln(10);
 /**
  * Fin de la segunda página del reporte.
  */
+
+
 /**
- * Creamos la tercera página del reporte.
+ * --- INICIO SECCIÓN MODIFICADA (APERTURAS EXTRAORDINARIAS) ---
  */
+
 /**
  * Comprobamos si hay aperturas extraordinarias en el mes del informe
  */
-$mesinforme = $esnmes;
-$anoinforme = $esnanio;
-$valnmes = (int) $esnmes;
-$valnanio = (int) $esnmes;
+$mesinforme = $esnmes; // $esnmes es string (ej: "7")
+$anoinforme = $esnanio; // $esnanio es string (ej: "2025")
+$valnmes = (int) $esnmes; // $valnmes es int (ej: 7)
+$valnanio = (int) $elanio; // $valnanio es int (ej: 2025)
 
-
-//    $lasql = "SELECT COUNT(*) FROM AperturasExtra WHERE MONTH(AeFecha) = .$esnmes. AND YEAR(AeFecha) = .$esnanio. AND AeCentro = .$centro.";
-//    $result = mysqli_query($conn, $lasql);
-//    $row = mysqli_fetch_array($result);
-//    $contador = $row[0];
+// Preparamos la consulta para CONTAR primero
 $stmt = $conn->prepare("SELECT COUNT(*) FROM AperturasExtra
                                   WHERE MONTH(AeFecha) = ?
                                   AND YEAR(AeFecha) = ?
                                   AND AeCentro = ?");
-$stmt->bind_param("iii", $esnmes, $esnanio, $centro);
+// Usamos las variables INT para el bind_param
+$stmt->bind_param("iii", $valnmes, $valnanio, $centros); // $centros ya es int
 $stmt->execute();
 $stmt->bind_result($contador);
 $stmt->fetch();
+$stmt->close(); // Cerramos el primer statement
+
+// Si hay registros (contador > 0), creamos la página completa
 if($contador > 0){
     $pdf->AddPage('L','A4');
     $fila = 20;
@@ -364,7 +367,7 @@ if($contador > 0){
     $pdf->Cell(277,7,utf8_decode('RELACIÓN DE APERTURAS EXTRAORDINARIAS'),1,0,'C');
     $fila += 7;
     $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
+    $pdf->SetTextColor(255); // Texto blanco
     $pdf->SetFont('Arial','',15);
     $pdf->SetXY(10, $fila);
     $pdf->Cell(30,7,utf8_decode('FECHA'),1,0,'C',true);
@@ -372,20 +375,81 @@ if($contador > 0){
     $pdf->Cell(40,7,utf8_decode('HORA FINAL'),1,0,'C',true);
     $pdf->Cell(167,7,utf8_decode('SERVICIO PRESTADO'),1,0,'C',true);
     $fila += 7;
-    $pdf->SetXY(10, $fila);
     $pdf->SetFillColor(255, 255, 255);
-    /**
-     * Debo añadir aqui la consulta a la tabla AperturasExtra para el mes, año y centro seleccionado.
-     * Ahora sigo a pelo con los de Julio para emitir el informe
-     */
-    $pdf->Cell(30,7, utf8_decode("25/07/2025"), 1, 0, 'C', true);
-    $pdf->Cell(40,7,utf8_decode('17:15'),1,0,'C',true);
-    $pdf->Cell(40,7,utf8_decode('18:45'),1,0,'C',true);
-    $pdf->SetFont('Arial','',15);
-    $pdf->Cell(167,7,utf8_decode('Rotura tubería baño planta baja'),1,0,'C',true);
-    $pdf->SetFont('Arial','',15);
+    $pdf->SetTextColor(0,0,0); // Texto negro
 
+    // 1. Preparar la consulta para obtener los detalles de AperturasExtra
+    $stmt_details = $conn->prepare("SELECT AeFecha, AeHoraInicio, AeHoraFinal, AeMotivo
+                                    FROM AperturasExtra
+                                    WHERE MONTH(AeFecha) = ?
+                                    AND YEAR(AeFecha) = ?
+                                    AND AeCentro = ?
+                                    ORDER BY AeFecha ASC, AeHoraInicio ASC");
+    // Usamos las variables INT para el bind_param
+    $stmt_details->bind_param("iii", $valnmes, $valnanio, $centros);
+    $stmt_details->execute();
+    $result_details = $stmt_details->get_result();
+
+    // 2. Iterar sobre los resultados y añadirlos al PDF
+    while ($row = $result_details->fetch_assoc()) {
+
+        // 3. Comprobar si hay espacio en la página (salto de página automático)
+        if($fila >= 180) { // Límite para salto de página
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            // REPETIR Encabezado de la tabla en la nueva página
+            $pdf->SetXY(10, $fila);
+            $pdf->SetFont('Arial','B',15);
+            $pdf->Cell(277,7,utf8_decode('RELACIÓN DE APERTURAS EXTRAORDINARIAS (Cont.)'),1,0,'C');
+            $fila += 7;
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial','',15);
+            $pdf->SetXY(10, $fila);
+            $pdf->Cell(30,7,utf8_decode('FECHA'),1,0,'C',true);
+            $pdf->Cell(40,7,utf8_decode('HORA INICIO'),1,0,'C',true);
+            $pdf->Cell(40,7,utf8_decode('HORA FINAL'),1,0,'C',true);
+            $pdf->Cell(167,7,utf8_decode('SERVICIO PRESTADO'),1,0,'C',true);
+            $fila += 7;
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->SetTextColor(0,0,0);
+        }
+
+        // 4. Formatear los datos obtenidos de la base de datos
+        $fechaFormateada = date_format(date_create($row['AeFecha']), 'd/m/Y');
+        $horaInicio = substr($row['AeHoraInicio'], 0, 5); // Formato HH:MM
+        $horaFinal = substr($row['AeHoraFinal'], 0, 5); // Formato HH:MM
+
+        // Truncar el motivo
+        $motivoTruncado = substr($row['AeMotivo'], 0, 140);
+        if (strlen($row['AeMotivo']) > 140) {
+            $motivoTruncado .= "...";
+        }
+
+        // 5. Añadir las celdas de datos al PDF
+        $pdf->SetFont('Arial','',10);
+        $pdf->SetXY(10, $fila);
+        $pdf->Cell(30, 7, utf8_decode($fechaFormateada), 1, 0, 'C', true);
+        $pdf->Cell(40, 7, utf8_decode($horaInicio), 1, 0, 'C', true);
+        $pdf->Cell(40, 7, utf8_decode($horaFinal), 1, 0, 'C', true);
+
+        $pdf->SetFont('Arial','',7); // Fuente más pequeña para el motivo
+        $pdf->Cell(167, 7, utf8_decode($motivoTruncado), 1, 0, 'J', true);
+
+        $fila += 7; // Avanzar a la siguiente fila
+    }
+
+    // 6. Cerrar el statement
+    $stmt_details->close();
 }
+// Si $contador es 0, toda la sección anterior se omite, y el script
+// continúa directamente a la siguiente página.
+
+/**
+ * --- FIN SECCIÓN MODIFICADA ---
+ */
+
+
 $pdf->AddPage('L','A4');
 $fila = 20;
 // Encabezado de la tabla
@@ -406,19 +470,17 @@ $pdf->SetTextColor(0,0,0);
 $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
 mysqli_set_charset($conn, "utf8");
 // Consulta SQL corregida
-// Asegúrate que $centro sea numérico, si no, usa comillas:
-// $sql = "SELECT ... WHERE Usucentro = '$centro' AND UsuTipo = 'U'";
-$sql = "SELECT UsuApellidoUno, UsuApellidoDos, UsuNombre, UsuCargo FROM Usuarios WHERE Usucentro = " . $centro . " AND UsuTipo = 'U'";
+$sql = "SELECT UsuApellidoUno, UsuApellidoDos, UsuNombre, UsuCargo FROM Usuarios WHERE Usucentro = " . $centros . " AND (UsuTipo = 'U' OR UsuTipo = 'Y')"; // Corregido
 $result = mysqli_query($conn, $sql);
 if(mysqli_num_rows($result) > 0){
     while($row = mysqli_fetch_assoc($result)){
-        if($fila >= 169){ // Salto de página si es necesario
+        if($fila >= 180){ // Salto de página si es necesario (Ajustado a 180mm)
             $pdf->AddPage('L','A4');
             $fila = 20;
             // Encabezado de la tabla
             $pdf->SetXY(10, $fila);
             $pdf->SetFont('Arial','B',15);
-            $pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO'),1,0,'C');
+            $pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO (Cont.)'),1,0,'C');
             $fila += 7;
             $pdf->SetFillColor(218,77,98);
             $pdf->SetTextColor(0,0,0);
@@ -436,8 +498,6 @@ if(mysqli_num_rows($result) > 0){
         $pdf->SetXY(149, $fila);
         $pdf->Cell(138,7,utf8_decode($row['UsuCargo']),1,0,'C');
         $fila += 7; // Incrementamos $fila para la siguiente fila
-        //$pdf->SetFont('Arial','',15);
-        //$pdf->Cell(130,7,utf8_decode(''),1,0,'L');
     }
 }
 /**
@@ -476,49 +536,43 @@ if (!$conn) {
     die("Error de conexión: " . mysqli_connect_error());
 }
 mysqli_set_charset($conn, "utf8");
-// Consulta SQL (corregida) - Asegúrate de que $esmesanio tenga el formato correcto para tu campo IncFecha
+// Consulta SQL
 $sql2 = "SELECT IncFecha, IncHora, IncTexto, IncComunicadoA, IncModoComunica, IncUsuario 
         FROM Incidencias 
         WHERE IncCentro = " . $centros . " AND IncFecha LIKE '" .$esmesanio."' ORDER BY IncFecha ASC, IncHora ASC";
-// Imprimir la consulta para depuración (opcional)
-// echo $sql2;
 $result = mysqli_query($conn, $sql2);
 if (!$result) {
     die("Error en la consulta: " . mysqli_error($conn));
 }
 $pdf->SetFillColor(255,255,255);
 $pdf->SetTextColor(0);
-$num_filas = mysqli_num_rows($result);
-$contador = 0;
 if(mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
-        $contador++;
         $pdf->SetFont('Arial','',10);
-        $pdf->SetXY(10, $fila); // X = 20
+        $pdf->SetXY(10, $fila); // X = 10
         $pdf->Cell(20,7,utf8_decode($row['IncFecha']),1,0,'C');
-        $pdf->SetXY(30, $fila);  // X = 20 + 20 = 40
+        $pdf->SetXY(30, $fila);  // X = 10 + 20 = 30
         $pdf->Cell(15,7,utf8_decode($row['IncHora']),1,0,'C');
-        $pdf->SetXY(45, $fila); //  X = 40 + 20 = 60
+        $pdf->SetXY(45, $fila); //  X = 30 + 15 = 45
         $pdf->SetFont('Arial','',6);
         $pdf->Cell(30, 7, utf8_decode($row['IncComunicadoA']), 1, 0, 'J');
         $pdf->SetXY(75, $fila);
         $pdf->SetFont('Arial','',10);
         $pdf->Cell(20, 7, utf8_decode($row['IncModoComunica']), 1, 0, 'C');
-        $pdf->SetFont('Arial','',7);
+        $pdf->SetFont('Arial','',6); // Corregido (era 7 en el original)
         $pdf->SetXY(95, $fila);
         $pdf->Cell(40, 7, utf8_decode($row['IncUsuario']), 1, 0, 'C');
         $pdf->SetXY(135, $fila);
         $pdf->SetFont('Arial','',7);
         $textoTruncado = substr($row['IncTexto'], 0, 128);
-        $pdf->Cell(152, 7, utf8_decode(''.$textoTruncado.''), 1, 'J');
-        //$pdf->MultiCell(130, 7, utf8_decode($row['IncTexto']), 1, 'J');
-        //$fila = $pdf->GetY(); // Obtiene la posición Y después del
-        if($fila >= 176) {
+        $pdf->Cell(152, 7, utf8_decode(''.$textoTruncado.''), 1, 0, 'J'); // Corregido
+
+        if($fila >= 180) { // Límite para salto de página (Ajustado a 180mm)
             $pdf->AddPage('L','A4');
             $fila = 20;
             $pdf->SetXY(10, $fila);
             $pdf->SetFont('Arial','B',15);
-            $pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO'),1,0,'C');
+            $pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO (Cont.)'),1,0,'C');
             $fila += 7;
             $pdf->SetFillColor(218,77,98);
             $pdf->SetTextColor(255);
@@ -536,8 +590,11 @@ if(mysqli_num_rows($result) > 0) {
             $pdf->SetXY(135, $fila);
             $pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'J',true);
             $fila += 7;
+            $pdf->SetFillColor(255,255,255); // Restaurar
+            $pdf->SetTextColor(0); // Restaurar
+        } else {
+            $fila += 7; // Avanzar fila si no hay salto
         }
-        $fila += 7;
     }
 }
 /**
@@ -558,14 +615,16 @@ $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@
 mysqli_set_charset($conn, "utf8");
 $elsql = "SELECT COUNT(*) AS Total FROM Movadoj WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'";
 $result = mysqli_query($conn, $elsql);
+
+$totalconteoderegistros = 0; // Inicializar
 if($result){
     $row = mysqli_fetch_assoc($result);
     $totalconteoderegistros = $row['Total'];
 }
 // Anchuras de las columnas (suman 277, el ancho total)
-$anchoDestino = 197;  // Aumentado
-$anchoVeces = 40;    // Aumentado
-$anchoPorcentaje = 40; // Aumentado
+$anchoDestino = 197;
+$anchoVeces = 40;
+$anchoPorcentaje = 40;
 
 $pdf->SetFillColor(255,255,255);
 $pdf->SetTextColor(0,0,0);
@@ -583,38 +642,60 @@ $pdf->Cell($anchoPorcentaje, 7, utf8_decode('PORCENTAJE:'), 1, 0, 'C', true);
 $fila += 7;
 
 //Consulta obtimizada para obtener el núero de visitas y el porcentaje directamente
-$lasql = "SELECT MovDestino, COUNT(*) AS num_visitas, 
-                (COUNT(*) * 100.0 / $totalconteoderegistros) AS porcentaje
-             FROM Movadoj 
-             WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'
-             GROUP BY MovDestino"; // Agrupamos por destino
-$resultadolasql = mysqli_query($conn, $lasql);
+if ($totalconteoderegistros > 0) { // Evitar división por cero
+    $lasql = "SELECT MovDestino, COUNT(*) AS num_visitas, 
+                    (COUNT(*) * 100.0 / $totalconteoderegistros) AS porcentaje
+                 FROM Movadoj 
+                 WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'
+                 GROUP BY MovDestino"; // Agrupamos por destino
+    $resultadolasql = mysqli_query($conn, $lasql);
+} else {
+    $resultadolasql = false;
+}
+
 //Mostrar resultados en la tabla
 $pdf->SetFillColor(255,255,255);
 $pdf->SetTextColor(0,0,0);
-while($mostrar = mysqli_fetch_assoc($resultadolasql)){
+
+if ($resultadolasql && mysqli_num_rows($resultadolasql) > 0) {
+    while($mostrar = mysqli_fetch_assoc($resultadolasql)){
+
+        if($fila >= 180) { // Límite para salto de página (Ajustado a 180mm)
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            // REPETIR Encabezado de la tabla en la nueva página
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial','', 12);
+            $pdf->SetXY(10, $fila);
+            $pdf->Cell($anchoDestino, 7 , utf8_decode('VISITAN A: (Cont.)'), 1, 0, 'C', true);
+            $pdf->SetXY(10 + $anchoDestino, $fila);
+            $pdf->Cell($anchoVeces, 7, utf8_decode('VECES:'), 1, 0, 'C', true);
+            $pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
+            $pdf->Cell($anchoPorcentaje, 7, utf8_decode('PORCENTAJE:'), 1, 0, 'C', true);
+            $fila += 7;
+            $pdf->SetFillColor(255,255,255);
+            $pdf->SetTextColor(0,0,0);
+        }
+
+        $pdf->SetXY(10, $fila);
+        $pdf->Cell($anchoDestino, 7, utf8_decode($mostrar['MovDestino']), 1, 0, 'L');
+
+        $pdf->SetXY(10 + $anchoDestino, $fila);
+        $pdf->Cell($anchoVeces, 7, utf8_decode($mostrar['num_visitas']), 1, 0, 'C');
+
+        $pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
+        $porcentajeFormateado = round($mostrar['porcentaje'], 2) . '%'; // Agregamos el signo de porcentaje
+        $pdf->Cell($anchoPorcentaje, 7, $porcentajeFormateado, 1, 0, 'C');
+
+        $fila += 7;
+    }
+} else {
+    // Mensaje si no hay visitas
     $pdf->SetXY(10, $fila);
-    $pdf->Cell($anchoDestino, 7, utf8_decode($mostrar['MovDestino']), 1, 0, 'L');
-
-    $pdf->SetXY(10 + $anchoDestino, $fila);
-    $pdf->Cell($anchoVeces, 7, utf8_decode($mostrar['num_visitas']), 1, 0, 'C');
-
-    $pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
-    $porcentajeFormateado = round($mostrar['porcentaje'], 2) . '%'; // Agregamos el signo de porcentaje
-    $pdf->Cell($anchoPorcentaje, 7, $porcentajeFormateado, 1, 0, 'C');
-
-
-    $fila += 7;
-
+    $pdf->Cell(277, 7, utf8_decode('No se encontraron visitas para este mes.'), 1, 0, 'C');
 }
 
-
 $pdf->Output();
-
-
-
-
-
-
 
 ?>

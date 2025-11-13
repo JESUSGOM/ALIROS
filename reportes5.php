@@ -1,625 +1,731 @@
 <?php
-    //require_once("db.php");
-    require_once("variables.php");
-    session_start();
-    require 'include/user_sesion.php';
-    require ("fpdf/fpdf.php");
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
-    mysqli_set_charset($conn, "utf8");
-    //echo var_dump($_POST);
-    $mesano = $_POST['mesano'];
-    $sucursal = $_POST['sucursal'];
-    $centro = $_POST['centro'];
-    $centros = intval($centro);
-    $centroden = $_POST['centroden'];
-    $comunico = $_POST['comunico'];
-    $esnmes = substr($mesano,5,2);
-    $esnano = substr($mesano,0,4);
-    $elmes = intval($esnmes);
-    $elanio = intval($esnano);
-    $diafactura = date("d",(mktime(0,0,0,$elmes+1,1,$elanio)-1));
-    $esndia = strval($diafactura);
-    $esnmes = strval($elmes);
-    $esnanio = strval($esnano);
-    $esmesanio = str_replace("-", "", $mesano);
-    $esmesanio = $esmesanio. "%";
-    $totalconteoderegistros = 0;
-    $valnmes = 0;
-    $valnanio = 0;
-    //Capturamos el nombre del centro según se recibe la variable $centros
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
-    mysqli_set_charset($conn, "utf8");
-    $misql = "SELECT CenDen FROM Centros WHERE CenId = $centros";
-    $result = mysqli_query($conn, $misql);
-    if(mysqli_num_rows($result) > 0){
-        while($row = mysqli_fetch_assoc($result)) {
-            $centroden = $row['CenDen'];
-            //echo $centroden;
-        }
+//require_once("db.php");
+require_once("variables.php");
+session_start();
+require 'include/user_sesion.php';
+require ("fpdf/fpdf.php");
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
+//echo var_dump($_POST);
+$mesano = $_POST['mesano'];
+$sucursal = $_POST['sucursal'];
+$centro = $_POST['centro'];
+$centros = intval($centro);
+$centroden = $_POST['centroden'];
+$comunico = $_POST['comunico'];
+$esnmes = substr($mesano,5,2);
+$esnano = substr($mesano,0,4);
+$elmes = intval($esnmes);
+$elanio = intval($esnano);
+$diafactura = date("d",(mktime(0,0,0,$elmes+1,1,$elanio)-1));
+$esndia = strval($diafactura);
+$esnmes = strval($elmes); // Aseguramos que $esnmes sea string para el switch
+$esnanio = strval($esnano);
+$esmesanio = str_replace("-", "", $mesano);
+$esmesanio = $esmesanio. "%";
+$totalconteoderegistros = 0;
+$valnmes = 0;
+$valnanio = 0;
+
+//Capturamos el nombre del centro según se recibe la variable $centros
+// (La reconexión no es estrictamente necesaria si $conn ya está activa, pero la mantenemos como en el original)
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
+$misql = "SELECT CenDen FROM Centros WHERE CenId = $centros";
+$result = mysqli_query($conn, $misql);
+if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_assoc($result)) {
+        $centroden = $row['CenDen'];
+        //echo $centroden;
     }
-    switch($esnmes){
-        case "1":
-            $esmes = "enero";
-            break;
-        case "2":
-            $esmes = "febrero";
-            break;
-        case "3":
-            $esmes = "marzo";
-            break;
-        case "4":
-            $esmes = "abril";
-            break;
-        case "5":
-            $esmes = "mayo";
-            break;
-        case "6":
-            $esmes = "junio";
-            break;
-        case "7":
-            $esmes = "julio";
-            break;
-        case "8":
-            $esmes = "agosto";
-            break;
-        case "9":
-            $esmes = "septiembre";
-            break;
-        case "10":
-            $esmes = "octubre";
-            break;
-        case "11":
-            $esmes = "noviembre";
-            break;
-        case "12":
-            $esmes = "diciembre";
-            break;
-    }
-    $fechatotalfacctura = $esndia . " de " . $esmes . " de " . $esnanio;
-    $MayusEsmes = strtoupper($esmes);
-    $altolinea = 6;
-    class PDF extends FPDF
+}
+
+switch($esnmes){ // $esnmes ya es string "01", "02", etc.
+    case "01": // Comparamos como string
+    case "1":
+        $esmes = "enero";
+        break;
+    case "02":
+    case "2":
+        $esmes = "febrero";
+        break;
+    case "03":
+    case "3":
+        $esmes = "marzo";
+        break;
+    case "04":
+    case "4":
+        $esmes = "abril";
+        break;
+    case "05":
+    case "5":
+        $esmes = "mayo";
+        break;
+    case "06":
+    case "6":
+        $esmes = "junio";
+        break;
+    case "07":
+    case "7":
+        $esmes = "julio";
+        break;
+    case "08":
+    case "8":
+        $esmes = "agosto";
+        break;
+    case "09":
+    case "9":
+        $esmes = "septiembre";
+        break;
+    case "10":
+        $esmes = "octubre";
+        break;
+    case "11":
+        $esmes = "noviembre";
+        break;
+    case "12":
+        $esmes = "diciembre";
+        break;
+}
+
+$fechatotalfacctura = $esndia . " de " . $esmes . " de " . $esnanio;
+$MayusEsmes = strtoupper($esmes);
+$altolinea = 6;
+
+class PDF extends FPDF
+{
+    function Header()
     {
-        function Header()
-        {
-            $this->Image('img/logoitcizq.png',15,5,30);
-            $this->SetFont('Arial','B',15);
-            $this->SetXY(135, 5); // Posiciona la celda en Y=5
-            $this->Cell(60,10,utf8_decode('Servicio de Recepción'),1,0,'I');
-            $this->Image('img/Envera_Logo_79_30.png',254,5,30);
-            $this->Ln(20); // Avanza 20mm para el contenido del header
-        }
-        function Footer(){
-            $this->SetY(-15);
-            $this->SetFont('Arial','I',8);
-            $this->Cell(0,10,'Pag '.$this->PageNo().'/{nb}',0,0,'C');
-        }
+        $this->Image('img/logoitcizq.png',15,5,30);
+        $this->SetFont('Arial','B',15);
+        $this->SetXY(135, 5); // Posiciona la celda en Y=5
+        $this->Cell(60,10,utf8_decode('Servicio de Recepción'),1,0,'I');
+        $this->Image('img/Envera_Logo_79_30.png',254,5,30);
+        $this->Ln(20); // Avanza 20mm para el contenido del header
     }
-    /**
-     *
-     * Creamos la portada del reporte.
-     *
-     */
-        $fila = 20;
-        $pdf = new PDF();
-        $pdf->AliasNbPages();
-        $pdf->AddPage('L','A4');
-        $imageFile = 'img/Imagen1.png';
-        $imageWidth = 277;
-        $imageHeight = 138.5;
-        //Calculamos la posición X e Y para centrar la imagen
-        $x = ($pdf->GetPageWidth() - $imageWidth) / 2;
-        $y = ($pdf->GetPageHeight() - $imageHeight) / 2 -10;
-        $pdf->Image($imageFile, $x, $y, $imageWidth, $imageHeight);
-        $pdf->SetFillColor(218,77,98);
-        $pdf->SetTextColor(0,0,0);
-    /**
-     * Fin de la portada del reporte
-     */
-    /**
-     * Creamos la primea página del reporte
-     */
-    $pdf->AddPage('L','A4');
-    $pdf->SetFont('Arial','B',15);
-    $pdf->SetXY(10, $fila);
-    $pdf->Cell(138,7,'CLIENTE:',1,0,'L',true);
-    $pdf->SetXY(149, $fila);
-    $pdf->Cell(138,7,'CIF',1,0,'L',true);
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','',11);
-    $pdf->Cell(138, 7, utf8_decode('SC 0079/2025'), 0, 0, 'L',true);
-    $pdf->SetXY(149, $fila);
-    $pdf->Cell(138,7,utf8_decode('A35313170'), 0, 0, 'L',true);
-    $fila = $fila + 7;
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(138,7,'DIRECCION:',1,0,'L',true);
-    $pdf->SetXY(149, $fila);
-    $pdf->Cell(138,7,'PERSONA DE CONTACTO',1,0,'L',true);
-    $fila = $fila + 7;
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',11);
-    $pdf->Cell(138, 7, utf8_decode('Plaza Sixto Machado, 3. 38009-Santa Cruz de Tenerife'), 0, 0, 'L',true);
-    $pdf->SetXY(149, $fila);
-    $pdf->Cell(138,7,utf8_decode('María Carmen Betancor Reula'), 0, 0, 'L',true);
-    $fila = $fila + 7;
-    $pdf->SetFont('Arial','B',15);
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->Cell(138,7,'FECHA:',1,0,'L',true);
-    $fila = $fila + 7;
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',11);
-    $pdf->Cell(138, 7, utf8_decode($fechatotalfacctura), 0, 0, 'L',true);
-    $fila = $fila + 14;
-    $pdf->SetFont('Arial','B',15);
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->Cell(277,7,'INFORME MENSUAL DEL MES '.$MayusEsmes.'',0,0,'C',true);
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $posvlinea = 90;
-    $pdf->Line(10, $posvlinea, $pdf->GetPageWidth() - 20, $posvlinea);
-    //$pdf->Cell(277, 7, utf8_decode('El valor recibido del centro es '.$centro.
-    //', de tipo = '.gettype($centro).'. Y lo convertirmo al valor '.$centros.
-    //', que es de tipo = '.gettype($centros).''), 0, 0, 'L', true);
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $textoPrimero = "El servicio de auxiliares de recepción para el centro 
+    function Footer(){
+        $this->SetY(-15);
+        $this->SetFont('Arial','I',8);
+        $this->Cell(0,10,'Pag '.$this->PageNo().'/{nb}',0,0,'C');
+    }
+}
+/**
+ *
+ * Creamos la portada del reporte.
+ *
+ */
+$fila = 20;
+$pdf = new PDF();
+$pdf->AliasNbPages();
+$pdf->AddPage('L','A4');
+$imageFile = 'img/Imagen1.png';
+$imageWidth = 277;
+$imageHeight = 138.5;
+//Calculamos la posición X e Y para centrar la imagen
+$x = ($pdf->GetPageWidth() - $imageWidth) / 2;
+$y = ($pdf->GetPageHeight() - $imageHeight) / 2 -10;
+$pdf->Image($imageFile, $x, $y, $imageWidth, $imageHeight);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+/**
+ * Fin de la portada del reporte
+ */
+/**
+ * Creamos la primea página del reporte
+ */
+$pdf->AddPage('L','A4');
+$pdf->SetFont('Arial','B',15);
+$pdf->SetXY(10, $fila);
+$pdf->Cell(138,7,'CLIENTE:',1,0,'L',true);
+$pdf->SetXY(149, $fila);
+$pdf->Cell(138,7,'CIF',1,0,'L',true);
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','',11);
+$pdf->Cell(138, 7, utf8_decode('SC 0079/2025'), 0, 0, 'L',true);
+$pdf->SetXY(149, $fila);
+$pdf->Cell(138,7,utf8_decode('A35313170'), 0, 0, 'L',true);
+$fila = $fila + 7;
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(138,7,'DIRECCION:',1,0,'L',true);
+$pdf->SetXY(149, $fila);
+$pdf->Cell(138,7,'PERSONA DE CONTACTO',1,0,'L',true);
+$fila = $fila + 7;
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',11);
+$pdf->Cell(138, 7, utf8_decode('Plaza Sixto Machado, 3. 38009-Santa Cruz de Tenerife'), 0, 0, 'L',true);
+$pdf->SetXY(149, $fila);
+$pdf->Cell(138,7,utf8_decode('María Carmen Betancor Reula'), 0, 0, 'L',true);
+$fila = $fila + 7;
+$pdf->SetFont('Arial','B',15);
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->Cell(138,7,'FECHA:',1,0,'L',true);
+$fila = $fila + 7;
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',11);
+$pdf->Cell(138, 7, utf8_decode($fechatotalfacctura), 0, 0, 'L',true);
+$fila = $fila + 14;
+$pdf->SetFont('Arial','B',15);
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+$pdf->Cell(277,7,'INFORME MENSUAL DEL MES '.$MayusEsmes.'',0,0,'C',true);
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$posvlinea = 90;
+$pdf->Line(10, $posvlinea, $pdf->GetPageWidth() - 20, $posvlinea);
+//$pdf->Cell(277, 7, utf8_decode('El valor recibido del centro es '.$centro.
+//', de tipo = '.gettype($centro).'. Y lo convertirmo al valor '.$centros.
+//', que es de tipo = '.gettype($centros).''), 0, 0, 'L', true);
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$textoPrimero = "El servicio de auxiliares de recepción para el centro 
     insular de Tenerife, del Instituto Tecnológico de Canarias, S.A., a partir de ahora: 'ITC'";
-    $textoSegundo = "engloba la siguiente actividad:";
-    $textoTercero = "Se trata de un edificio que alberta las oficinas prinipales del ITC 
+$textoSegundo = "engloba la siguiente actividad:";
+$textoTercero = "Se trata de un edificio que alberta las oficinas prinipales del ITC 
     en la provincia de Santa Cruz de Tnerife. Dispone de dos plantes con una";
-    $textoCuarto = "superficie aproximada de 4699m² que albergan dependencias destinadas a
+$textoCuarto = "superficie aproximada de 4699m² que albergan dependencias destinadas a
     oficinas administrativas, despachos de Dirección, almacenes,";
-    $textoQuinto = "archivos, CPD's, laboratorios, nidos de empresas y determinadas 
+$textoQuinto = "archivos, CPD's, laboratorios, nidos de empresas y determinadas 
     zonas comunes tales como salón de actos, salas de reuniones, cafeteria,etc...";
-    $textoSexto = "";
-    $textoSeptimo = "La Fase 1ª del centro dispone de cubierta plana transitable para el uso
+$textoSexto = "";
+$textoSeptimo = "La Fase 1ª del centro dispone de cubierta plana transitable para el uso
     de conservación, mientras que la cubierta de la Fase 2 es inclinada,";
-    $textoOctavo = "con algunos sectores en diente de sierra y otros a dos aguas.";
-    $textoNoveno = "El Centro también dispone de espacios exteriores alrededor del cuerpo flontal de la
+$textoOctavo = "con algunos sectores en diente de sierra y otros a dos aguas.";
+$textoNoveno = "El Centro también dispone de espacios exteriores alrededor del cuerpo flontal de la
     edificación, con un vial interior, espacios ajardinados y";
-    $textoDecimo = "aparcamientos al aire libre. El recinto se encuentra vallado.";
-    $textoDecimoPrimero = "Las Funciones que desarrolla Envera con su personal auxiliar de recepción son:";
-    $textoDecimoSegundo = "a. Apertura y cierre de puertas y ventanas al inicio y final de la jornada.";
-    $textoDecimoTercero = "b. Atención a la centralita telefónica, gestión del fax central y registro telefónico.";
-    $textoDecimoCuarto = "c. Atención -guía-orientación a visitantes, proveedores y clientes del ITC.";
-    $textoDecimoQuinto = "c. Atención -guía-orientación a visitantes, proveedores y clientes del ITC.";
-    $textoDecimoSexto = "d. Custodia del cuadro de llaves de servicio y control de la entrega/devolución de las mismas por los usuarios del edificio.";
-    $textoDecimoSeptimo = "e. Gestión centralizada de las entradas de correpondencia y paquetería.";
-    $textoDecimoOctavo = "f. Tareas propias de portería y recepción.";
-    $textoDecimoNoveno = "g. Operación rutinaria de equipos generales básicos del edificio.";
-    $textoVigesimo = "h. Participar en la faceta de comunicación e incidencias y/o alarmas en el edificio.";
-    $pdf->Cell(277, 7,utf8_decode(''.$textoPrimero.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoSegundo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoTercero.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoCuarto.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoQuinto.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoSeptimo.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoOctavo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoNoveno.''),0,0,'J',true);
-    $fila = $fila + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(277, 7,utf8_decode(''.$textoDecimo.''),0,0,'J',true);
-    /**
-     * Fin de la primera página del reporte
-     */
-    /**
-     * Creamos la segunda página del reporte
-     */
-    $pdf->AddPage('L','A4');
-    $fila = 20;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238,7,utf8_decode(''.$textoDecimoPrimero.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSegundo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoTercero.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoCuarto.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoQuinto.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSexto.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSeptimo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoOctavo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoDecimoNoveno.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea - 2;
-    $pdf->SetXY(20, $fila);
-    $pdf->SetFont('Arial','',12);
-    $pdf->Cell(238, 7,utf8_decode(''.$textoVigesimo.''),0,0,'J',true);
-    $fila = $fila + $altolinea + $altolinea;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(120,7,'HORARIO DEL SERVICIO',1,0,'C');
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(120,7,'HORARIOS ESPECIALES',1,0,'C');
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    //$pdf->Cell(120,7,'LUNES A VIERNES',1,0,'C',true);
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(120,7,'SERVICIOS EXTRAORDINARIOS',1,0,'C',true);
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','',15);
-    $pdf->Cell(60,7,utf8_decode('MAÑANAS'),1,0,'C');
-    $pdf->SetXY(70, $fila);
-    $pdf->Cell(60,7,utf8_decode('TARDES'),1,0,'C');
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(60,7,'FECHA',1,0,'C');
-    //$pdf->SetXY(207, $fila);
-    //$pdf->Cell(60,7,'FECHA',1,0,'C');
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','',15);
-    $pdf->Cell(60,7,utf8_decode('6:45 - 12:00'),1,0,'C');
-    $pdf->SetXY(70, $fila);
-    $pdf->Cell(60,7,utf8_decode('12:00 - 17:15'),1,0,'C');
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(60,7,utf8_decode('12/04/2025'),1,0,'C');
-    //$pdf->SetXY(207, $fila);
-    //$pdf->Cell(60,7,utf8_decode('24/04/2025'),1,0,'C');
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(60,7,utf8_decode('APERTURA:'),1,0,'C',true);
-    $pdf->SetXY(70, $fila);
-    $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(60,7,utf8_decode('CIERRE:'),1,0,'C',true);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(60,7,utf8_decode('H.DESDE/H.HASTA'),1,0,'C',true);
-    //$pdf->SetXY(207, $fila);
-    //$pdf->Cell(60,7,utf8_decode('H.DESDE/H.HASTA'),1,0,'C',true);
-    $fila = $fila + 7;
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('Arial','',15);
-    $pdf->Cell(60,7,utf8_decode('6:45'),1,0,'C');
-    $pdf->SetFont('Arial','',15);
-    $pdf->SetFont('Arial','',15);
-    //$pdf->SetXY(147, $fila);
-    //$pdf->Cell(60,7,utf8_decode('09:30/11:30 '),1,0,'C');
-    $pdf->SetXY(70, $fila);
-    $pdf->Cell(60,7,utf8_decode('17:15 '),1,0,'C');
-    //$pdf->SetXY(207, $fila);
-    //$pdf->Cell(60,7,utf8_decode('17:15/18:15'),1,0,'C');
+$textoDecimo = "aparcamientos al aire libre. El recinto se encuentra vallado.";
+$textoDecimoPrimero = "Las Funciones que desarrolla Envera con su personal auxiliar de recepción son:";
+$textoDecimoSegundo = "a. Apertura y cierre de puertas y ventanas al inicio y final de la jornada.";
+$textoDecimoTercero = "b. Atención a la centralita telefónica, gestión del fax central y registro telefónico.";
+$textoDecimoCuarto = "c. Atención -guía-orientación a visitantes, proveedores y clientes del ITC.";
+$textoDecimoQuinto = "c. Atención -guía-orientación a visitantes, proveedores y clientes del ITC.";
+$textoDecimoSexto = "d. Custodia del cuadro de llaves de servicio y control de la entrega/devolución de las mismas por los usuarios del edificio.";
+$textoDecimoSeptimo = "e. Gestión centralizada de las entradas de correpondencia y paquetería.";
+$textoDecimoOctavo = "f. Tareas propias de portería y recepción.";
+$textoDecimoNoveno = "g. Operación rutinaria de equipos generales básicos del edificio.";
+$textoVigesimo = "h. Participar en la faceta de comunicación e incidencias y/o alarmas en el edificio.";
+$pdf->Cell(277, 7,utf8_decode(''.$textoPrimero.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoSegundo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoTercero.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoCuarto.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoQuinto.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoSeptimo.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoOctavo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoNoveno.''),0,0,'J',true);
+$fila = $fila + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(277, 7,utf8_decode(''.$textoDecimo.''),0,0,'J',true);
+/**
+ * Fin de la primera página del reporte
+ */
+/**
+ * Creamos la segunda página del reporte
+ */
+$pdf->AddPage('L','A4');
+$fila = 20;
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238,7,utf8_decode(''.$textoDecimoPrimero.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSegundo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoTercero.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoCuarto.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoQuinto.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSexto.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoSeptimo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoOctavo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoDecimoNoveno.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea - 2;
+$pdf->SetXY(20, $fila);
+$pdf->SetFont('Arial','',12);
+$pdf->Cell(238, 7,utf8_decode(''.$textoVigesimo.''),0,0,'J',true);
+$fila = $fila + $altolinea + $altolinea;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(120,7,'HORARIO DEL SERVICIO',1,0,'C');
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(120,7,'HORARIOS ESPECIALES',1,0,'C');
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+//$pdf->Cell(120,7,'LUNES A VIERNES',1,0,'C',true);
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(120,7,'SERVICIOS EXTRAORDINARIOS',1,0,'C',true);
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','',15);
+$pdf->Cell(60,7,utf8_decode('MAÑANAS'),1,0,'C');
+$pdf->SetXY(70, $fila);
+$pdf->Cell(60,7,utf8_decode('TARDES'),1,0,'C');
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(60,7,'FECHA',1,0,'C');
+//$pdf->SetXY(207, $fila);
+//$pdf->Cell(60,7,'FECHA',1,0,'C');
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','',15);
+$pdf->Cell(60,7,utf8_decode('6:45 - 12:00'),1,0,'C');
+$pdf->SetXY(70, $fila);
+$pdf->Cell(60,7,utf8_decode('12:00 - 17:15'),1,0,'C');
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(60,7,utf8_decode('12/04/2025'),1,0,'C');
+//$pdf->SetXY(207, $fila);
+//$pdf->Cell(60,7,utf8_decode('24/04/2025'),1,0,'C');
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(60,7,utf8_decode('APERTURA:'),1,0,'C',true);
+$pdf->SetXY(70, $fila);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(60,7,utf8_decode('CIERRE:'),1,0,'C',true);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(60,7,utf8_decode('H.DESDE/H.HASTA'),1,0,'C',true);
+//$pdf->SetXY(207, $fila);
+//$pdf->Cell(60,7,utf8_decode('H.DESDE/H.HASTA'),1,0,'C',true);
+$fila = $fila + 7;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','',15);
+$pdf->Cell(60,7,utf8_decode('6:45'),1,0,'C');
+$pdf->SetFont('Arial','',15);
+$pdf->SetFont('Arial','',15);
+//$pdf->SetXY(147, $fila);
+//$pdf->Cell(60,7,utf8_decode('09:30/11:30 '),1,0,'C');
+$pdf->SetXY(70, $fila);
+$pdf->Cell(60,7,utf8_decode('17:15 '),1,0,'C');
+//$pdf->SetXY(207, $fila);
+//$pdf->Cell(60,7,utf8_decode('17:15/18:15'),1,0,'C');
 
-    $pdf->Ln(10);
-    /**
-     * Fin de la segunda página del reporte.
-     */
-    /**
-     * Creamos la tercera página del reporte.
-     */
-    /**
-     * Comprobamos si hay aperturas extraordinarias en el mes del informe
-     */
-    $mesinforme = $esnmes;
-    $anoinforme = $esnanio;
-    $valnmes = (int) $esnmes;
-    $valnanio = (int) $esnmes;
+$pdf->Ln(10);
+/**
+ * Fin de la segunda página del reporte.
+ */
+/**
+ * Creamos la tercera página del reporte.
+ */
+/**
+ * Comprobamos si hay aperturas extraordinarias en el mes del informe
+ */
+$mesinforme = $esnmes; // $esnmes es string "07"
+$anoinforme = $esnanio; // $esnanio es string "2025"
+$valnmes = (int) $esnmes; // $valnmes es int 7
+$valnanio = (int) $elanio; // $valnanio es int 2025 (Corregido de $esnanio a $elanio)
 
-
-//    $lasql = "SELECT COUNT(*) FROM AperturasExtra WHERE MONTH(AeFecha) = .$esnmes. AND YEAR(AeFecha) = .$esnanio. AND AeCentro = .$centro.";
-//    $result = mysqli_query($conn, $lasql);
-//    $row = mysqli_fetch_array($result);
-//    $contador = $row[0];
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM AperturasExtra
+// Preparamos la consulta para CONTAR primero
+$stmt = $conn->prepare("SELECT COUNT(*) FROM AperturasExtra
                                   WHERE MONTH(AeFecha) = ?
                                   AND YEAR(AeFecha) = ?
                                   AND AeCentro = ?");
-    $stmt->bind_param("iii", $esnmes, $esnanio, $centro);
-    $stmt->execute();
-    $stmt->bind_result($contador);
-    $stmt->fetch();
-    if($contador > 0){
-        $pdf->AddPage('L','A4');
-        $fila = 20;
-        //Encabezado de la tabla
-        $pdf->SetXY(10, $fila);
-        $pdf->SetFont('Arial','B',15);
-        $pdf->Cell(277,7,utf8_decode('RELACIÓN DE APERTURAS EXTRAORDINARIAS'),1,0,'C');
-        $fila += 7;
-        $pdf->SetFillColor(218,77,98);
-        $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('Arial','',15);
-        $pdf->SetXY(10, $fila);
-        $pdf->Cell(30,7,utf8_decode('FECHA'),1,0,'C',true);
-        $pdf->Cell(40,7,utf8_decode('HORA INICIO'),1,0,'C',true);
-        $pdf->Cell(40,7,utf8_decode('HORA FINAL'),1,0,'C',true);
-        $pdf->Cell(167,7,utf8_decode('SERVICIO PRESTADO'),1,0,'C',true);
-        $fila += 7;
-        $pdf->SetXY(10, $fila);
-        $pdf->SetFillColor(255, 255, 255);
-        /**
-         * Debo añadir aqui la consulta a la tabla AperturasExtra para el mes, año y centro seleccionado.
-         * Ahora sigo a pelo con los de Julio para emitir el informe
-         */
-        $pdf->Cell(30,7, utf8_decode("19/07/2025"), 1, 0, 'C', true);
-        $pdf->Cell(40,7,utf8_decode('08:00'),1,0,'C',true);
-        $pdf->Cell(40,7,utf8_decode('15:30'),1,0,'C',true);
-        $pdf->SetFont('Arial','',7);
-        $pdf->Cell(167,7,utf8_decode('Apertura del centro por desmontaje de vallas publicitarias en parcela contigua de ampliación de Sixto Machado-Canary Photos.'),1,0,'C',true);
-        $pdf->SetFont('Arial','',15);
+// Usamos las variables INT para el bind_param
+$stmt->bind_param("iii", $valnmes, $valnanio, $centros); // $centros ya es int
+$stmt->execute();
+$stmt->bind_result($contador);
+$stmt->fetch();
+$stmt->close(); // Cerramos el primer statement
 
-    }
+// --- INICIO DE LA SECCIÓN MODIFICADA ---
+
+if($contador > 0){
     $pdf->AddPage('L','A4');
     $fila = 20;
-    // Encabezado de la tabla
+    //Encabezado de la tabla
     $pdf->SetXY(10, $fila);
     $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO'),1,0,'C');
+    $pdf->Cell(277,7,utf8_decode('RELACIÓN DE APERTURAS EXTRAORDINARIAS'),1,0,'C');
     $fila += 7;
     $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(0,0,0);
+    $pdf->SetTextColor(255); // Texto en blanco para que sea legible sobre el fondo rojo
+    $pdf->SetFont('Arial','',15); // Tamaño de fuente 15 como en otras cabeceras
     $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','',15);
-    $pdf->Cell(138,7,utf8_decode('APELLIDOS Y NOMBRE'),1,0,'C',true);
-    $pdf->SetXY(149, $fila);
-    $pdf->Cell(138,7,utf8_decode('PUESTO / CARGO'),1,0,'C',true);
-    $fila += 7; // Incrementamos $fila para la primera fila de datos
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
-    mysqli_set_charset($conn, "utf8");
-        // Consulta SQL corregida
-    // Asegúrate que $centro sea numérico, si no, usa comillas:
-    // $sql = "SELECT ... WHERE Usucentro = '$centro' AND UsuTipo = 'U'";
-    $sql = "SELECT UsuApellidoUno, UsuApellidoDos, UsuNombre, UsuCargo FROM Usuarios WHERE Usucentro = " . $centro . " AND UsuTipo = 'U' OR UsuTipo = 'Y'";
-    $result = mysqli_query($conn, $sql);
-    mysqli_set_charset($conn, "utf8");
-    if(mysqli_num_rows($result) > 0){
-        while($row = mysqli_fetch_assoc($result)){
-            if($fila >= 169){ // Salto de página si es necesario
-                $pdf->AddPage('L','A4');
-                $fila = 20;
-                // Encabezado de la tabla
-                $pdf->SetXY(10, $fila);
-                $pdf->SetFont('Arial','B',15);
-                $pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO'),1,0,'C');
-                $fila += 7;
-                $pdf->SetFillColor(218,77,98);
-                $pdf->SetTextColor(0,0,0);
-                $pdf->SetXY(10, $fila);
-                $pdf->SetFont('Arial','',15);
-                $pdf->Cell(138,7,utf8_decode('APELLIDOS Y NOMBRE'),1,0,'C',true);
-                $pdf->SetXY(149, $fila);
-                $pdf->Cell(138,7,utf8_decode('PUESTO / CARGO'),1,0,'C',true);
-                $fila += 7; // Incrementamos $fila para la primera fila de datos
-                $pdf->SetFillColor(255,255,255);
-                $pdf->SetTextColor(0,0,0);
-            }
-            $pdf->SetXY(10, $fila); // Posición para los datos
-            $pdf->Cell(138,7,utf8_decode($row['UsuApellidoUno'].' '.$row['UsuApellidoDos'].' '.$row['UsuNombre']),1,0,'L');
-            $pdf->SetXY(149, $fila);
-            $pdf->Cell(138,7,utf8_decode($row['UsuCargo']),1,0,'C');
-            $fila += 7; // Incrementamos $fila para la siguiente fila
-            //$pdf->SetFont('Arial','',15);
-            //$pdf->Cell(130,7,utf8_decode(''),1,0,'L');
+    $pdf->Cell(30,7,utf8_decode('FECHA'),1,0,'C',true);
+    $pdf->Cell(40,7,utf8_decode('HORA INICIO'),1,0,'C',true);
+    $pdf->Cell(40,7,utf8_decode('HORA FINAL'),1,0,'C',true);
+    $pdf->Cell(167,7,utf8_decode('SERVICIO PRESTADO'),1,0,'C',true);
+    $fila += 7;
+    $pdf->SetFillColor(255, 255, 255); // Fondo blanco para filas de datos
+    $pdf->SetTextColor(0,0,0); // Texto negro para filas de datos
+
+    // 1. Preparar la consulta para obtener los detalles de AperturasExtra
+    $stmt_details = $conn->prepare("SELECT AeFecha, AeHoraInicio, AeHoraFinal, AeMotivo
+                                        FROM AperturasExtra
+                                        WHERE MONTH(AeFecha) = ?
+                                        AND YEAR(AeFecha) = ?
+                                        AND AeCentro = ?
+                                        ORDER BY AeFecha ASC, AeHoraInicio ASC");
+    // Usamos las variables INT para el bind_param
+    $stmt_details->bind_param("iii", $valnmes, $valnanio, $centros);
+    $stmt_details->execute();
+    $result_details = $stmt_details->get_result();
+
+    // 2. Iterar sobre los resultados y añadirlos al PDF
+    while ($row = $result_details->fetch_assoc()) {
+
+        // 3. Comprobar si hay espacio en la página (salto de página automático)
+        if($fila >= 180) { // Límite para salto de página
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            // REPETIR Encabezado de la tabla en la nueva página
+            $pdf->SetXY(10, $fila);
+            $pdf->SetFont('Arial','B',15);
+            $pdf->Cell(277,7,utf8_decode('RELACIÓN DE APERTURAS EXTRAORDINARIAS (Cont.)'),1,0,'C');
+            $fila += 7;
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial','',15);
+            $pdf->SetXY(10, $fila);
+            $pdf->Cell(30,7,utf8_decode('FECHA'),1,0,'C',true);
+            $pdf->Cell(40,7,utf8_decode('HORA INICIO'),1,0,'C',true);
+            $pdf->Cell(40,7,utf8_decode('HORA FINAL'),1,0,'C',true);
+            $pdf->Cell(167,7,utf8_decode('SERVICIO PRESTADO'),1,0,'C',true);
+            $fila += 7;
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->SetTextColor(0,0,0);
         }
+
+        // 4. Formatear los datos obtenidos de la base de datos
+        $fechaFormateada = date_format(date_create($row['AeFecha']), 'd/m/Y');
+        $horaInicio = substr($row['AeHoraInicio'], 0, 5); // Formato HH:MM
+        $horaFinal = substr($row['AeHoraFinal'], 0, 5); // Formato HH:MM
+
+        // Truncar el motivo, similar a como haces en la tabla de incidencias
+        $motivoTruncado = substr($row['AeMotivo'], 0, 140);
+        if (strlen($row['AeMotivo']) > 140) {
+            $motivoTruncado .= "..."; // Añadir puntos suspensivos si se corta
+        }
+
+        // 5. Añadir las celdas de datos al PDF
+        $pdf->SetFont('Arial','',10); // Fuente normal para las primeras celdas
+        $pdf->SetXY(10, $fila);
+        $pdf->Cell(30, 7, utf8_decode($fechaFormateada), 1, 0, 'C', true);
+        $pdf->Cell(40, 7, utf8_decode($horaInicio), 1, 0, 'C', true);
+        $pdf->Cell(40, 7, utf8_decode($horaFinal), 1, 0, 'C', true);
+
+        $pdf->SetFont('Arial','',7); // Fuente más pequeña para el motivo
+        $pdf->Cell(167, 7, utf8_decode($motivoTruncado), 1, 0, 'J', true);
+
+        $fila += 7; // Avanzar a la siguiente fila
     }
-    /**
-     * Fin de la tercera página del reporte.
-     */
-    /**
-     * Creamos la cuarta página del reporte.
-     */
-    $pdf->AddPage('L','A4');
-    $fila = 20;
-//    mysqli_set_charset($conn, "utf8");
-    // Encabezado
-    $pdf->SetXY(10, $fila);
-    $pdf->SetFont('Arial','B',15);
-    $pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO'),1,0,'C');
-    $fila += 7;
-    $pdf->SetFillColor(218,77,98);
-    $pdf->SetTextColor(255);
-    $pdf->SetFont('Arial','',10);
-    $pdf->SetXY(10, $fila);
-    $pdf->Cell(20,7,utf8_decode('FECHA'),1,0,'C',true);
-    $pdf->SetXY(30, $fila);
-    $pdf->Cell(15,7,utf8_decode('HORA'),1,0,'C',true);
-    $pdf->SetXY(45, $fila);
-    $pdf->Cell(30,7,utf8_decode('COMUNICADO A'),1,0,'C',true);
-    $pdf->SetXY(75, $fila);
-    $pdf->Cell(20,7,utf8_decode('FORMA'),1,0,'C',true);
-    $pdf->SetXY(95, $fila);
-    $pdf->Cell(40,7,utf8_decode('COMUNICADO POR'),1,0,'C',true);
-    $pdf->SetXY(135, $fila);
-    $pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'C',true);
-    $fila += 7;
-    // Conexión a la base de datos
-    $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
-    mysqli_set_charset($conn, "utf8");
-    if (!$conn) {
-        die("Error de conexión: " . mysqli_connect_error());
+
+    // 6. Cerrar el statement
+    $stmt_details->close();
+
+} // Fin de if($contador > 0)
+
+// --- FIN DE LA SECCIÓN MODIFICADA ---
+
+$pdf->AddPage('L','A4');
+$fila = 20;
+// Encabezado de la tabla
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO'),1,0,'C');
+$fila += 7;
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(0,0,0);
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','',15);
+$pdf->Cell(138,7,utf8_decode('APELLIDOS Y NOMBRE'),1,0,'C',true);
+$pdf->SetXY(149, $fila);
+$pdf->Cell(138,7,utf8_decode('PUESTO / CARGO'),1,0,'C',true);
+$fila += 7; // Incrementamos $fila para la primera fila de datos
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+
+// (La reconexión no es estrictamente necesaria si $conn ya está activa, pero la mantenemos como en el original)
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
+
+// Consulta SQL corregida
+$sql = "SELECT UsuApellidoUno, UsuApellidoDos, UsuNombre, UsuCargo FROM Usuarios WHERE Usucentro = " . $centros . " AND (UsuTipo = 'U' OR UsuTipo = 'Y')"; // Corrección: (UsuTipo = 'U' OR UsuTipo = 'Y')
+$result = mysqli_query($conn, $sql);
+// mysqli_set_charset($conn, "utf8"); // Ya está establecido arriba
+
+if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_assoc($result)){
+        if($fila >= 180){ // Salto de página (Ajustado a 180mm)
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            // Encabezado de la tabla
+            $pdf->SetXY(10, $fila);
+            $pdf->SetFont('Arial','B',15);
+            $pdf->Cell(277,7,utf8_decode('PERSONAL ADSCRITO AL SERVICIO (Cont.)'),1,0,'C');
+            $fila += 7;
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(0,0,0);
+            $pdf->SetXY(10, $fila);
+            $pdf->SetFont('Arial','',15);
+            $pdf->Cell(138,7,utf8_decode('APELLIDOS Y NOMBRE'),1,0,'C',true);
+            $pdf->SetXY(149, $fila);
+            $pdf->Cell(138,7,utf8_decode('PUESTO / CARGO'),1,0,'C',true);
+            $fila += 7; // Incrementamos $fila para la primera fila de datos
+            $pdf->SetFillColor(255,255,255);
+            $pdf->SetTextColor(0,0,0);
+        }
+        $pdf->SetXY(10, $fila); // Posición para los datos
+        $pdf->Cell(138,7,utf8_decode($row['UsuApellidoUno'].' '.$row['UsuApellidoDos'].' '.$row['UsuNombre']),1,0,'L');
+        $pdf->SetXY(149, $fila);
+        $pdf->Cell(138,7,utf8_decode($row['UsuCargo']),1,0,'C');
+        $fila += 7; // Incrementamos $fila para la siguiente fila
     }
-    mysqli_set_charset($conn, "utf8");
-    // Consulta SQL (corregida) - Asegúrate de que $esmesanio tenga el formato correcto para tu campo IncFecha
-    $sql2 = "SELECT IncFecha, IncHora, IncTexto, IncComunicadoA, IncModoComunica, IncUsuario 
+}
+/**
+ * Fin de la tercera página del reporte.
+ */
+/**
+ * Creamos la cuarta página del reporte.
+ */
+$pdf->AddPage('L','A4');
+$fila = 20;
+// Encabezado
+$pdf->SetXY(10, $fila);
+$pdf->SetFont('Arial','B',15);
+$pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO'),1,0,'C');
+$fila += 7;
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(255);
+$pdf->SetFont('Arial','',10);
+$pdf->SetXY(10, $fila);
+$pdf->Cell(20,7,utf8_decode('FECHA'),1,0,'C',true);
+$pdf->SetXY(30, $fila);
+$pdf->Cell(15,7,utf8_decode('HORA'),1,0,'C',true);
+$pdf->SetXY(45, $fila);
+$pdf->Cell(30,7,utf8_decode('COMUNICADO A'),1,0,'C',true);
+$pdf->SetXY(75, $fila);
+$pdf->Cell(20,7,utf8_decode('FORMA'),1,0,'C',true);
+$pdf->SetXY(95, $fila);
+$pdf->Cell(40,7,utf8_decode('COMUNICADO POR'),1,0,'C',true);
+$pdf->SetXY(135, $fila);
+$pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'C',true);
+$fila += 7;
+
+// (La reconexión no es estrictamente necesaria si $conn ya está activa, pero la mantenemos como en el original)
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
+if (!$conn) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
+// mysqli_set_charset($conn, "utf8"); // Ya está establecido arriba
+
+// Consulta SQL (corregida)
+$sql2 = "SELECT IncFecha, IncHora, IncTexto, IncComunicadoA, IncModoComunica, IncUsuario 
         FROM Incidencias 
         WHERE IncCentro = " . $centros . " AND IncFecha LIKE '" .$esmesanio."' ORDER BY IncFecha ASC, IncHora ASC";
-    // Imprimir la consulta para depuración (opcional)
-    // echo $sql2;
-    $result = mysqli_query($conn, $sql2);
-    if (!$result) {
-        die("Error en la consulta: " . mysqli_error($conn));
-    }
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0);
-    $num_filas = mysqli_num_rows($result);
-    $contador = 0;
-    if(mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $contador++;
-            $pdf->SetFont('Arial','',10);
-            $pdf->SetXY(10, $fila); // X = 20
-            $pdf->Cell(20,7,utf8_decode($row['IncFecha']),1,0,'C');
-            $pdf->SetXY(30, $fila);  // X = 20 + 20 = 40
-            $pdf->Cell(15,7,utf8_decode($row['IncHora']),1,0,'C');
-            $pdf->SetXY(45, $fila); //  X = 40 + 20 = 60
-            $pdf->SetFont('Arial','',6);
-            $pdf->Cell(30, 7, utf8_decode($row['IncComunicadoA']), 1, 0, 'J');
-            $pdf->SetXY(75, $fila);
-            $pdf->SetFont('Arial','',10);
-            $pdf->Cell(20, 7, utf8_decode($row['IncModoComunica']), 1, 0, 'C');
-            $pdf->SetFont('Arial','',6);
-            $pdf->SetXY(95, $fila);
-            $pdf->Cell(40, 7, utf8_decode($row['IncUsuario']), 1, 0, 'C');
-            $pdf->SetXY(135, $fila);
-            $pdf->SetFont('Arial','',7);
-            $textoTruncado = substr($row['IncTexto'], 0, 128);
-            $pdf->Cell(152, 7, utf8_decode(''.$textoTruncado.''), 1, 'J');
-            //$pdf->MultiCell(130, 7, utf8_decode($row['IncTexto']), 1, 'J');
-            //$fila = $pdf->GetY(); // Obtiene la posición Y después del
-            if($fila >= 176) {
-                $pdf->AddPage('L','A4');
-                $fila = 20;
-                $pdf->SetXY(10, $fila);
-                $pdf->SetFont('Arial','B',15);
-                $pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO'),1,0,'C');
-                $fila += 7;
-                $pdf->SetFillColor(218,77,98);
-                $pdf->SetTextColor(255);
-                $pdf->SetFont('Arial','',10);
-                $pdf->SetXY(10, $fila);
-                $pdf->Cell(20,7,utf8_decode('FECHA'),1,0,'C',true);
-                $pdf->SetXY(30, $fila);
-                $pdf->Cell(15,7,utf8_decode('HORA'),1,0,'C',true);
-                $pdf->SetXY(45, $fila);
-                $pdf->Cell(30,7,utf8_decode('COMUNICADO A'),1,0,'C',true);
-                $pdf->SetXY(75, $fila);
-                $pdf->Cell(20,7,utf8_decode('FORMA'),1,0,'C',true);
-                $pdf->SetXY(95, $fila);
-                $pdf->Cell(40,7,utf8_decode('COMUNICADO POR'),1,0,'C',true);
-                $pdf->SetXY(135, $fila);
-                $pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'J',true);
-                $fila += 7;
-            }
+
+$result = mysqli_query($conn, $sql2);
+if (!$result) {
+    die("Error en la consulta: " . mysqli_error($conn));
+}
+
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0);
+
+if(mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $pdf->SetFont('Arial','',10);
+        $pdf->SetXY(10, $fila);
+        $pdf->Cell(20,7,utf8_decode($row['IncFecha']),1,0,'C');
+        $pdf->SetXY(30, $fila);
+        $pdf->Cell(15,7,utf8_decode($row['IncHora']),1,0,'C');
+        $pdf->SetXY(45, $fila);
+        $pdf->SetFont('Arial','',6);
+        $pdf->Cell(30, 7, utf8_decode($row['IncComunicadoA']), 1, 0, 'J');
+        $pdf->SetXY(75, $fila);
+        $pdf->SetFont('Arial','',10);
+        $pdf->Cell(20, 7, utf8_decode($row['IncModoComunica']), 1, 0, 'C');
+        $pdf->SetFont('Arial','',6);
+        $pdf->SetXY(95, $fila);
+        $pdf->Cell(40, 7, utf8_decode($row['IncUsuario']), 1, 0, 'C');
+        $pdf->SetXY(135, $fila);
+        $pdf->SetFont('Arial','',7);
+        $textoTruncado = substr($row['IncTexto'], 0, 128);
+        $pdf->Cell(152, 7, utf8_decode(''.$textoTruncado.''), 1, 0, 'J'); // Quitamos el salto de línea
+
+        if($fila >= 180) { // Límite para salto de página (Ajustado a 180mm)
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            $pdf->SetXY(10, $fila);
+            $pdf->SetFont('Arial','B',15);
+            $pdf->Cell(277,7,utf8_decode('RELACIÓN DE INCIDENCIAS DEL SERVICIO (Cont.)'),1,0,'C');
             $fila += 7;
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial','',10);
+            $pdf->SetXY(10, $fila);
+            $pdf->Cell(20,7,utf8_decode('FECHA'),1,0,'C',true);
+            $pdf->SetXY(30, $fila);
+            $pdf->Cell(15,7,utf8_decode('HORA'),1,0,'C',true);
+            $pdf->SetXY(45, $fila);
+            $pdf->Cell(30,7,utf8_decode('COMUNICADO A'),1,0,'C',true);
+            $pdf->SetXY(75, $fila);
+            $pdf->Cell(20,7,utf8_decode('FORMA'),1,0,'C',true);
+            $pdf->SetXY(95, $fila);
+            $pdf->Cell(40,7,utf8_decode('COMUNICADO POR'),1,0,'C',true);
+            $pdf->SetXY(135, $fila);
+            $pdf->Cell(152,7,utf8_decode('INCIDENCIA'),1,0,'J',true);
+            $fila += 7;
+            $pdf->SetFillColor(255,255,255); // Restaurar color de fondo
+            $pdf->SetTextColor(0); // Restaurar color de texto
+        } else {
+            $fila += 7; // Solo avanzamos la fila si no hay salto de página
         }
     }
-    /**
-     * Fin de la cuarta página del reporte.
-     */
-    /**
-     * Creamos la quinta página del reporte.
-     * Esta quinta página está dedicada a la estadística de visitas.
-     */
-        $pdf->AddPage('L','A4');
-        $fila = 20;
-        $pdf->SetXY(10, $fila);
-        $pdf->SetFillColor(218,77,98);
-        $pdf->SetTextColor(255);
-        $pdf->SetFont('Arial', 'B', 12);
-        //Conectamos bbdd para obtener el número de registros de las visitas.
-        $conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
-        mysqli_set_charset($conn, "utf8");
-        $elsql = "SELECT COUNT(*) AS Total FROM Movadoj WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'";
-        $result = mysqli_query($conn, $elsql);
-        if($result){
-            $row = mysqli_fetch_assoc($result);
-            $totalconteoderegistros = $row['Total'];
-        }
-        // Anchuras de las columnas (suman 277, el ancho total)
-        $anchoDestino = 197;  // Aumentado
-        $anchoVeces = 40;    // Aumentado
-        $anchoPorcentaje = 40; // Aumentado
+}
+/**
+ * Fin de la cuarta página del reporte.
+ */
+/**
+ * Creamos la quinta página del reporte.
+ * Esta quinta página está dedicada a la estadística de visitas.
+ */
+$pdf->AddPage('L','A4');
+$fila = 20;
+$pdf->SetXY(10, $fila);
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(255);
+$pdf->SetFont('Arial', 'B', 12);
 
-        $pdf->SetFillColor(255,255,255);
-        $pdf->SetTextColor(0,0,0);
-        $pdf->Cell(277,7,utf8_decode('Total Visitas recibidas en el mes de '.$esmes. ' es de '.$totalconteoderegistros),1,0,'C',true);
-        $fila += 7;
-        $pdf->SetFillColor(218,77,98);
-        $pdf->SetTextColor(255);
-        $pdf->SetFont('Arial','', 12);
-        $pdf->SetXY(10, $fila);
-        $pdf->Cell($anchoDestino, 7 , utf8_decode('VISITAN A:'), 1, 0, 'C', true);
-        $pdf->SetXY(10 + $anchoDestino, $fila);
-        $pdf->Cell($anchoVeces, 7, utf8_decode('VECES:'), 1, 0, 'C', true);
-        $pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
-        $pdf->Cell($anchoPorcentaje, 7, utf8_decode('PORCENTAJE:'), 1, 0, 'C', true);
-        $fila += 7;
+//Conectamos bbdd para obtener el número de registros de las visitas.
+// (La reconexión no es estrictamente necesaria si $conn ya está activa, pero la mantenemos como en el original)
+$conn = mysqli_connect('mysql-8001.dinaserver.com', 'Conacelbs','Mi-@cc3s0-es-p@ra-@L1R0!','Conlabac');
+mysqli_set_charset($conn, "utf8");
 
-        //Consulta obtimizada para obtener el núero de visitas y el porcentaje directamente
-        $lasql = "SELECT MovDestino, COUNT(*) AS num_visitas, 
-                (COUNT(*) * 100.0 / $totalconteoderegistros) AS porcentaje
-             FROM Movadoj 
-             WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'
-             GROUP BY MovDestino"; // Agrupamos por destino
-        $resultadolasql = mysqli_query($conn, $lasql);
-        //Mostrar resultados en la tabla
-    $pdf->SetFillColor(255,255,255);
-    $pdf->SetTextColor(0,0,0);
+$elsql = "SELECT COUNT(*) AS Total FROM Movadoj WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'";
+$result = mysqli_query($conn, $elsql);
+
+$totalconteoderegistros = 0; // Inicializar en 0
+if($result){
+    $row = mysqli_fetch_assoc($result);
+    $totalconteoderegistros = $row['Total'];
+}
+
+// Anchuras de las columnas (suman 277, el ancho total)
+$anchoDestino = 197;
+$anchoVeces = 40;
+$anchoPorcentaje = 40;
+
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+$pdf->Cell(277,7,utf8_decode('Total Visitas recibidas en el mes de '.$esmes. ' es de '.$totalconteoderegistros),1,0,'C',true);
+$fila += 7;
+$pdf->SetFillColor(218,77,98);
+$pdf->SetTextColor(255);
+$pdf->SetFont('Arial','', 12);
+$pdf->SetXY(10, $fila);
+$pdf->Cell($anchoDestino, 7 , utf8_decode('VISITAN A:'), 1, 0, 'C', true);
+$pdf->SetXY(10 + $anchoDestino, $fila);
+$pdf->Cell($anchoVeces, 7, utf8_decode('VECES:'), 1, 0, 'C', true);
+$pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
+$pdf->Cell($anchoPorcentaje, 7, utf8_decode('PORCENTAJE:'), 1, 0, 'C', true);
+$fila += 7;
+
+//Consulta optimizada para obtener el número de visitas y el porcentaje directamente
+// Aseguramos que $totalconteoderegistros no sea 0 para evitar división por cero
+if ($totalconteoderegistros > 0) {
+    $lasql = "SELECT MovDestino, COUNT(*) AS num_visitas, 
+                    (COUNT(*) * 100.0 / $totalconteoderegistros) AS porcentaje
+                 FROM Movadoj 
+                 WHERE MovCentro = $centros AND MovFechaEntrada LIKE '$esmesanio'
+                 GROUP BY MovDestino"; // Agrupamos por destino
+    $resultadolasql = mysqli_query($conn, $lasql);
+} else {
+    $resultadolasql = false; // No ejecutar consulta si no hay visitas
+}
+
+//Mostrar resultados en la tabla
+$pdf->SetFillColor(255,255,255);
+$pdf->SetTextColor(0,0,0);
+
+if ($resultadolasql && mysqli_num_rows($resultadolasql) > 0) { // Comprobamos si hay resultados
     while($mostrar = mysqli_fetch_assoc($resultadolasql)){
+
+        if($fila >= 180) { // Límite para salto de página (Ajustado a 180mm)
+            $pdf->AddPage('L','A4');
+            $fila = 20;
+            // REPETIR Encabezado de la tabla en la nueva página
+            $pdf->SetFillColor(218,77,98);
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial','', 12);
+            $pdf->SetXY(10, $fila);
+            $pdf->Cell($anchoDestino, 7 , utf8_decode('VISITAN A: (Cont.)'), 1, 0, 'C', true);
+            $pdf->SetXY(10 + $anchoDestino, $fila);
+            $pdf->Cell($anchoVeces, 7, utf8_decode('VECES:'), 1, 0, 'C', true);
+            $pdf->SetXY(10 + $anchoDestino + $anchoVeces, $fila);
+            $pdf->Cell($anchoPorcentaje, 7, utf8_decode('PORCENTAJE:'), 1, 0, 'C', true);
+            $fila += 7;
+            $pdf->SetFillColor(255,255,255);
+            $pdf->SetTextColor(0,0,0);
+        }
+
         $pdf->SetXY(10, $fila);
         $pdf->Cell($anchoDestino, 7, utf8_decode($mostrar['MovDestino']), 1, 0, 'L');
 
@@ -632,6 +738,11 @@
 
         $fila += 7;
     }
+} else {
+    // Opcional: Mostrar un mensaje si no hay visitas
+    $pdf->SetXY(10, $fila);
+    $pdf->Cell(277, 7, utf8_decode('No se encontraron visitas para este mes.'), 1, 0, 'C');
+}
 
 $pdf->Output();
 
