@@ -50,7 +50,7 @@
     $clavecorreo = "";
     $destinatario = "adominguez@itccanarias.org";
     $nombredestinatario = "Dª Adriana Domínguez Sicilia";
-    $destinatario2 = "conserjeriaitc.gc@grupoenvera.org"
+    $destinatario2 = "conserjeriaitc.gc@grupoenvera.org";
     $nombredestinatario2 = "Conserjeria ITC Gran Canaria";
     /* $destinatario = "adewilde@itccanarias.org";
     $nombredestinatario = "Dº Alejandro de Wilde Calero"; */
